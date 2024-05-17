@@ -12,19 +12,23 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.06,
     shadowRadius: 10,
+    gap: spacing.sm,
     paddingVertical: spacing.md
   },
-  pressableContainer: {
+  iconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: '50%',
+    backgroundColor: colors.black,
     flex: 1,
-    gap: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center'
   },
   icon: {
-    width: 56,
-    height: 56,
+    width: 38,
+    height: 38,
   },
   text: {
     fontFamily: fontFamilies.paragraph,
@@ -35,11 +39,11 @@ const styles = StyleSheet.create({
 
 export default function CardButton({ text, icon, onPress }) {
   return (
-    <View style={ styles.container }>
-      <Pressable style={ styles.pressableContainer } onPress={ onPress }>
+    <Pressable style={ styles.container } onPress={ onPress }>
+      <View style={ styles.iconContainer }>
         <Image style={ styles.icon } source={ icon } />
-        <Text style={ styles.text }>{ text }</Text>
-      </Pressable>
-    </View>
+      </View>
+      <Text style={ styles.text }>{ text }</Text>
+    </Pressable>
   );
 }

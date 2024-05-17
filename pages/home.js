@@ -1,17 +1,37 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ScrollView, Button, View, Text } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CardButton from '../components/cardButton';
 import Hero from '../components/hero';
-import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
+import { colors, fontFamilies, spacing, textSizes, borderRadius } from '../constants/styles';
 import Recipe from '../components/recipe';
 import React, { Fragment, useState } from 'react';
 import BottomSheet from '../components/bottomSheet';
+import getDay from '../utils/getDay';
+import Pivot from '../components/pivot';
+import { cuts } from '../data/cuts';
+import { recipeList } from '../data/recipes';
+import Button from '../components/button';
+
+const meatIcons = {
+  'pollo': require('../assets/images/icons/pollo.png'),
+  'res': require('../assets/images/icons/res.png'),
+  'cordero': require('../assets/images/icons/cordero.png'),
+  'pato': require('../assets/images/icons/pato.png'),
+  'cerdo': require('../assets/images/icons/cerdo.png'),
+  'cuy': require('../assets/images/icons/cuy.png')
+}
 
 export default function HomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const [sheet, setSheet] = useState(null);
-  const onCardPress = () => setSheet(!sheet);
+  const onCardPress = (newSheet) => setSheet(newSheet);
+  const onSheetClose = () => setSheet(null);
+  const currentDate = getDay();
+  const cardRows = [
+    ['Pollo', 'Res', 'Cerdo'],
+    ['Cordero', 'Pato', 'Cuy']
+  ]
 
   const styles = StyleSheet.create({
     container: {
@@ -31,18 +51,68 @@ export default function HomeScreen({ navigation }) {
       gap: spacing.xs,
       marginBottom: spacing.xs
     },
+    subHeadingContainer: {
+      paddingHorizontal: spacing.lg,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+      flex: 1,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexDirection: 'row',
+      width: '100%'
+    },
     subHeading: {
       fontFamily: fontFamilies.subhead,
       fontSize: textSizes.navHeader,
-      marginTop: spacing.lg,
-      marginBottom: spacing.xs,
-      paddingHorizontal: spacing.lg
     },
     body: {
       fontFamily: fontFamilies.paragraph,
       fontSize: textSizes.body
+    },
+    pivotImage: {
+      width: 80,
+      height: 80,
+      borderRadius: borderRadius
     }
   });
+
+  const recipeArray = Object.keys(recipeList);
+  const renderRecipes = recipeArray.map((recipe, i) => (
+    <Recipe
+      title={ recipeList[recipe].title }
+      img={ recipeList[recipe].img }
+      onPress={ () => navigation.navigate('Recipe', { recipe: recipeList[recipe] }) }
+      offset={ i === 0 }
+      key={ recipeList[recipe].id }
+      duration={ `${recipeList[recipe].time}min` }
+    />
+  ));
+
+  const renderCards = cardRows.map(row => (
+    <View style={ styles.row }>
+      { row.map(meat => {
+        const formattedMeat = meat.toLowerCase();
+        return (
+          <CardButton
+            key={ meat }
+            text={ meat }
+            icon={ meatIcons[formattedMeat] }
+            onPress={ () => onCardPress(formattedMeat) }
+          />
+        );
+      })}
+    </View>
+  ));
+
+  const cutPivots = cuts[sheet] 
+    ? cuts[sheet].map(cut => (
+      <Pivot
+        { ...cut }
+        onPress={ () => cut.link(navigation) }
+        key={ cut.id }
+      />
+    ))
+    : null;
 
   return (
     <Fragment>
@@ -50,30 +120,23 @@ export default function HomeScreen({ navigation }) {
         <Hero
           background={ require('../assets/images/hero_home.jpg') }
           title='Qué vas a rostizar hoy?'
-          eyebrow='Viernes, feb. 17'
+          eyebrow={ currentDate }
         />
         <View style={ styles.section }>
-          <View style={ styles.row }>
-            <CardButton text='Pollo' icon={ require('../assets/images/icons/pollo.png') } onPress={ onCardPress } />
-            <CardButton text='Res' icon={ require('../assets/images/icons/res.png') } onPress={ onCardPress } />
-            <CardButton text='Cerdo' icon={ require('../assets/images/icons/cerdo.png') } onPress={ onCardPress } />
-          </View>
-          <View style={ styles.row }>
-            <CardButton text='Cordero' icon={ require('../assets/images/icons/cordero.png') } onPress={ onCardPress } />
-            <CardButton text='Pato' icon={ require('../assets/images/icons/pato.png') } onPress={ onCardPress } />
-            <CardButton text='Otro' icon={ require('../assets/images/icons/cuy.png') } onPress={ onCardPress } />
-          </View>
+          { renderCards }
         </View>
-        <Text style={ styles.subHeading }>Recetas</Text>
+        <View style={ styles.subHeadingContainer }>
+          <Text style={ styles.subHeading }>Recetas</Text>
+          <Button as='link' text='Ver más' onPress={ () => navigation.navigate('Recipes') } />
+        </View>
         <ScrollView horizontal>
-          <Recipe title='Panceta' img={ require('../assets/images/hero_home.jpg') } onPress={ () => navigation.navigate('Recipes') } offset />
-          <Recipe title='Panceta' img={ require('../assets/images/hero_home.jpg') } onPress={ () => navigation.navigate('Recipes') } />
-          <Recipe title='Panceta' img={ require('../assets/images/hero_home.jpg') } onPress={ () => navigation.navigate('Recipes') } />
+          { renderRecipes }
         </ScrollView>
+        <View style={{ height: 36 + insets.bottom }}></View>
         <StatusBar style='light' />
       </ScrollView>
-      <BottomSheet backdropOnPress={ onCardPress } isOpen={ sheet } offsetBottom={ insets.bottom }>
-        <Recipe title='Panceta' img={ require('../assets/images/hero_home.jpg') } onPress={ () => navigation.navigate('Recipes') } />
+      <BottomSheet backdropOnPress={ onSheetClose } isOpen={ sheet } offsetBottom={ insets.bottom } title={ sheet }>
+        { cutPivots }
       </BottomSheet>
     </Fragment>
   );

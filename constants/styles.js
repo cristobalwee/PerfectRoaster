@@ -3,7 +3,9 @@ export const textSizes = {
   header2: 24,
   navHeader: 20,
   heroText: 54,
-  body: 16
+  body: 16,
+  bodySmall: 14,
+  tag: 12
 };
 
 export const fontFamilies = {
@@ -14,14 +16,19 @@ export const fontFamilies = {
 
 export const colors = {
   boxBackground: '#F5F3F0',
-  white: '#FFF'
+  white: '#FFF',
+  black: '#2F2E2E',
+  border: '#E6E6E6',
+  dark: '#000',
+  link: '#444'
 };
 
 export const spacing = {
   xs: 10,
   sm: 16,
   md: 20,
-  lg: 24
+  lg: 24,
+  xl: 32
 };
 
 export const borderRadius = 12;
