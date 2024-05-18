@@ -5,7 +5,7 @@ import CardButton from '../components/cardButton';
 import Hero from '../components/hero';
 import { colors, fontFamilies, spacing, textSizes, borderRadius } from '../constants/styles';
 import Recipe from '../components/recipe';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import BottomSheet from '../components/bottomSheet';
 import getDay from '../utils/getDay';
 import Pivot from '../components/pivot';
@@ -22,7 +22,7 @@ const meatIcons = {
   'cuy': require('../assets/images/icons/cuy.png')
 }
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const [sheet, setSheet] = useState(null);
   const onCardPress = (newSheet) => setSheet(newSheet);
@@ -75,6 +75,10 @@ export default function HomeScreen({ navigation }) {
       borderRadius: borderRadius
     }
   });
+
+  useEffect(() => {
+    if (route.params && route.params.resetState) setSheet(null);
+  }, [route]);
 
   const recipeArray = Object.keys(recipeList);
   const renderRecipes = recipeArray.map((recipe, i) => (

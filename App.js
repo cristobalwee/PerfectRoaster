@@ -8,8 +8,11 @@ import HomeScreen from './pages/home';
 import RecipesScreen from './pages/recipes';
 import { fontFamilies, spacing, textSizes } from './constants/styles';
 import RecipeScreen from './pages/recipePage';
-import SelectionPage from './pages/selectionPage';
+import WeightSelectionPage from './pages/weightSelectionPage';
+import CookSelectionPage from './pages/cookSelectionPage';
 import TimerPage from './pages/timer';
+
+// https://www.reactnative.university/blog/live-activities-unleashed
 
 const Stack = createNativeStackNavigator();
 
@@ -20,8 +23,8 @@ export default function App() {
     'Poppins-SemiBold': require('./assets/fonts/Poppins-SemiBold.ttf')
   });
 
-  const getBackButton = (navigation) => (
-    <Pressable onPress={ () => navigation.goBack() }>
+  const getBackButton = (back) => (
+    <Pressable onPress={ back }>
       <Image style={{ width: 24, height: 24 }} source={ require('./assets/images/icons/chevron-left.png') } />
     </Pressable>
   )
@@ -46,7 +49,7 @@ export default function App() {
             component={RecipesScreen} 
             options={({ navigation }) => ({
               title: 'Recetas',
-              headerLeft: () => getBackButton(navigation),
+              headerLeft: () => getBackButton(() => navigation.goBack()),
               headerShadowVisible: false,
               headerTitleStyle: {
                 fontFamily: fontFamilies.subhead,
@@ -63,10 +66,10 @@ export default function App() {
           />
           <Stack.Screen 
             name='WeightSelection' 
-            component={SelectionPage} 
+            component={WeightSelectionPage} 
             options={({ navigation }) => ({
-              title: 'Peso',
-              headerLeft: () => getBackButton(navigation),
+              title: 'Tamaño',
+              headerLeft: () => getBackButton(() => navigation.goBack()),
               headerShadowVisible: false,
               headerTitleStyle: {
                 fontFamily: fontFamilies.subhead,
@@ -76,10 +79,10 @@ export default function App() {
           />
           <Stack.Screen 
             name='CookSelection' 
-            component={SelectionPage} 
+            component={CookSelectionPage} 
             options={({ navigation }) => ({
               title: 'Cocción',
-              headerLeft: () => getBackButton(navigation),
+              headerLeft: () => getBackButton(() => navigation.goBack()),
               headerShadowVisible: false,
               headerTitleStyle: {
                 fontFamily: fontFamilies.subhead,
@@ -92,7 +95,7 @@ export default function App() {
             component={TimerPage} 
             options={({ navigation }) => ({
               title: 'Temporizador',
-              headerLeft: () => getBackButton(navigation),
+              headerLeft: () => getBackButton(() => navigation.navigate('Home', { resetState: true })),
               headerShadowVisible: false,
               headerTitleStyle: {
                 fontFamily: fontFamilies.subhead,

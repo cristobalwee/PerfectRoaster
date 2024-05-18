@@ -1,17 +1,22 @@
 import { Fragment, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, ScrollView, View } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, Image } from 'react-native';
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import Button from '../components/button';
-import { cookTimes } from '../data/cookTimes';
+import { cookData } from '../data/cookData';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RadioGroup from '../components/radioGroup';
 
-export default function SelectionPage({ route, navigation }) {
-  const { cut, hasCook } = route.params;
+export default function CookSelectionPage({ route, navigation }) {
+  const { cut, weight } = route.params;
   const [selected, setSelected] = useState(0);
   const insets = useSafeAreaInsets();
+  const cookNames = { med_rare: 'A punto', med: 'Término medio', med_well: 'Medio cocido', well: 'Bien cocido' };
 
+  const cookVals = Object.keys(cookData[cut][weight].cooks);
+  const cookId = cookVals[selected];
+  const cook = cookData[cut][weight].cooks[cookId];
+  
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -33,18 +38,19 @@ export default function SelectionPage({ route, navigation }) {
     <Fragment>
       <ScrollView style={styles.container}>
         <RadioGroup 
-          data={ [
-            { title: '2300-2500g', subtitle: 'Grande' },
-            { title: '2100-2300g', subtitle: 'Mediano' },
-            { title: '1800-2100g', subtitle: 'Pequeño' }
-          ] }
+          data={ cookVals.map(val => ({ title: cookNames[val], subtitle: 'Temperatura' })) }
           selected={ selected }
           onSelect={ setSelected }
         />
         <StatusBar style="auto" />
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <Button as='primary' text='Siguiente' onPress={ () => navigation.push('CookSelection', { cut }) } />
+        <Button
+          as='primary'
+          text='Siguiente'
+          onPress={ () => navigation.navigate('Timer', { cut, weight, cook }) }
+          icon={ <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right-light.png') } /> }
+        />
       </View>
     </Fragment>
   );

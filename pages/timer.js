@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, ScrollView, View } from 'react-native';
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import Button from '../components/button';
-import { cookTimes } from '../data/cookTimes';
+import { cookData } from '../data/cookData';
 
 const styles = StyleSheet.create({
   container: {
@@ -12,29 +12,20 @@ const styles = StyleSheet.create({
   }
 });
 
-const getValue = (cut, weight, cook) => {
-  if (weight) {
-    if (cook) return cookTimes[cut][weight][cook];
-
-    return cookTimes[cut][weight];
-  }
-
-  if (cook) return cookTimes[cut][cook];
-
-  return cookTimes[cut]
+const getValues = (val) => {
+  return Array.isArray(val) ? val[0] : val;
 }
 
 export default function TimerPage({ route, navigation }) {
-  const { cut, weight = null, cook = null } = route.params;
-  const val = getValue(cut, weight, cook);
-  if (typeof val === 'number') {
-    toShow = val;
-  } else if (Array.isArray(val)) {
-    toShow = val[0];
+  const { cut, weight, cook } = route.params;
+  let finalCookTime = getValues(cookData[cut][weight].cooks);
+  if (cook) {
+    finalCookTime = getValues(cook);
   }
+
   return (
     <ScrollView style={styles.container}>
-      <Text>{ toShow }</Text>
+      <Text>{ finalCookTime } </Text>
       <StatusBar style="auto" />
     </ScrollView>
   );

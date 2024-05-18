@@ -48,7 +48,8 @@ export default function Button({ text, icon, as, fullWidth = false, onPress }) {
     text: {
       fontFamily: fontFamilies.subhead,
       fontSize: textSizes.body,
-      color: foregroundColors[as]
+      color: foregroundColors[as],
+      marginRight: !!icon ? spacing.xs : null
     }
   });
 
