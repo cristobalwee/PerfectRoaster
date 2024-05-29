@@ -23,13 +23,13 @@ const styles = StyleSheet.create({
   },
   icon: {
     width: 20,
-    height: 20
+    height: 20,
   }
 });
 
 export default function Pivot({ media, title, subtitle, size = 'lg', onPress }) {  
   return (
-    <Pressable style={  styles.container} onPress={ onPress }>
+    <Pressable style={styles.container} onPress={ onPress }>
       <View style={ styles.content }>
         { media }
         <View style={ styles.innerContent }>

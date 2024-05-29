@@ -51,7 +51,7 @@ export default function WeightSelectionPage({ route, navigation }) {
           as='primary'
           text='Siguiente'
           onPress={ () => navigation.navigate(nextRoute, { cut, weight, cook }) }
-          icon={ <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right-light.png') } /> }
+          arrow
         />
       </View>
     </Fragment>

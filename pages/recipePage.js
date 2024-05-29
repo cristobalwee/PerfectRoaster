@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, ScrollView, FlatList, View } from 'react-native';
-import CardButton from '../components/cardButton';
 import Hero from '../components/hero';
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 

@@ -1,14 +1,16 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, Image } from 'react-native';
 import { borderRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 
-export default function Button({ text, icon, as, fullWidth = false, onPress }) {
+export default function Button({ text, icon, as, fullWidth = false, onPress, arrow }) {
   const backgroundColors = {
     'primary': colors.black,
-    'secondary': colors.white
+    'secondary': colors.white,
+    'secondary_alt': colors.boxBackground
   };
   const foregroundColors = {
     'primary': colors.white,
-    'secondary': colors.dark
+    'secondary': colors.dark,
+    'secondary_alt': colors.dark
   };
 
   if (as === 'link') {
@@ -43,7 +45,8 @@ export default function Button({ text, icon, as, fullWidth = false, onPress }) {
       flex: 1,
       justifyContent: 'space-between',
       alignItems: 'center',
-      flexDirection: 'row'
+      flexDirection: 'row',
+      gap: spacing.xs
     },
     text: {
       fontFamily: fontFamilies.subhead,
@@ -56,8 +59,9 @@ export default function Button({ text, icon, as, fullWidth = false, onPress }) {
   return (
     <Pressable style={styles.container} onPress={ onPress }>
       <View style={styles.content}>
-        <Text style={styles.text}>{ text }</Text>
         { icon }
+        <Text style={styles.text}>{ text }</Text>
+        { arrow &&  <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right-light.png') } /> }
       </View>
     </Pressable>
   );

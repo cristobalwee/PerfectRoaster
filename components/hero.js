@@ -5,12 +5,12 @@ import { fontFamilies, colors, textSizes, spacing } from '../constants/styles';
 
 const windowDimensions = Dimensions.get('window');
 
-export default function Hero({ eyebrow, title, back, background, size = 'lg' }) {
+export default function Hero({ eyebrow, title, back, background, size = 'lg', rightAction }) {
   const insets = useSafeAreaInsets();
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      height: windowDimensions.height * (size === 'sm' ? 0.32 : 0.35)
+      height: windowDimensions.height * (size === 'sm' ? 0.32 : 0.36)
     },
     image: {
       position: 'relative',
@@ -48,6 +48,22 @@ export default function Hero({ eyebrow, title, back, background, size = 'lg' }) 
     backIcon: {
       width: 18,
       height: 18
+    },
+    rightAction: {
+      position: 'absolute',
+      width: 52,
+      height: 52,
+      backgroundColor: colors.white,
+      borderRadius: '50%',
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      right: spacing.lg,
+      top: insets.top + spacing.xs
+    },
+    rightActionIcon: {
+      width: 24,
+      height: 24
     }
   });
 
@@ -60,6 +76,11 @@ export default function Hero({ eyebrow, title, back, background, size = 'lg' }) 
         { back && (
           <Pressable style={ styles.back } onPress={ back }>
             <Image style={ styles.backIcon } source={ require('../assets/images/icons/chevron-left.png') } />
+          </Pressable>
+        )}
+        { rightAction && (
+          <Pressable style={ styles.rightAction } onPress={ rightAction }>
+            <Image style={ styles.rightActionIcon } source={ require('../assets/images/icons/settings.png') } />
           </Pressable>
         )}
       </ImageBackground>

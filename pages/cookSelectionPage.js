@@ -21,7 +21,8 @@ export default function CookSelectionPage({ route, navigation }) {
     container: {
       flex: 1,
       backgroundColor: colors.boxBackground,
-      padding: spacing.lg
+      padding: spacing.lg,
+      paddingBottom: 50
     },
     buttonContainer: {
       position: 'absolute',
@@ -29,8 +30,8 @@ export default function CookSelectionPage({ route, navigation }) {
       flex: 1,
       width: '100%',
       backgroundColor: colors.boxBackground,
-      padding: 36,
-      paddingBottom: 36 + insets.bottom
+      padding: spacing.lg,
+      paddingBottom: spacing.lg + insets.bottom
     }
   });
 
@@ -49,7 +50,7 @@ export default function CookSelectionPage({ route, navigation }) {
           as='primary'
           text='Siguiente'
           onPress={ () => navigation.navigate('Timer', { cut, weight, cook }) }
-          icon={ <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right-light.png') } /> }
+          arrow
         />
       </View>
     </Fragment>

@@ -12,9 +12,8 @@ import Animated, {
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 
 const PressAnimated = Animated.createAnimatedComponent(Pressable);
-const CLAMP = 20;
 
-export default function BottomSheet({ offsetBottom, title, children, isOpen, backdropOnPress }) {
+export default function BottomSheet({ offsetBottom, title, children, isOpen, backdropOnPress, hasActions }) {
   const offset = useSharedValue(0);
   const [animOffset, setAnimOffset] = useState(0);
   const styles = StyleSheet.create({
@@ -53,7 +52,9 @@ export default function BottomSheet({ offsetBottom, title, children, isOpen, bac
       width: 24
     },
     content: {
-      padding: spacing.lg,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.lg,
+      paddingBottom: hasActions ? 0 : spacing.lg,
       gap: spacing.md,
       marginBottom: offsetBottom
     }

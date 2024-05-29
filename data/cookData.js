@@ -1,65 +1,65 @@
 export const cookData = {
   'pollo_entero': {
-    'sm': { weight: 1800, cooks: [66, 70] },
-    'md': { weight: 2100, cooks: [70, 75] },
-    'lg': { weight: 2300, cooks: [75, 80] }
+    'lg': { weight: 2300, cooks: [4500, 4800] },
+    'md': { weight: 2100, cooks: [4200, 4500] },
+    'sm': { weight: 1800, cooks: [3960, 4200] }
   },
   'pollo_pechuga': {
-    'sm': { weight: 500, cooks: 45 },
-    'lg': { weight: 650, cooks: 50 }
+    'lg': { weight: 650, cooks: 3000 },
+    'sm': { weight: 500, cooks: 2700 }
   },
   'pollo_pierna': {
-    'sm': { weight: 300, cooks: [40, 45] },
-    'lg': { weight: 350, cooks: [45, 49] }
+    'lg': { weight: 350, cooks: [2700, 2940] },
+    'sm': { weight: 300, cooks: [2400, 2700] }
   },
   'res_t_bone': {
     'sm': {
       weight: 550,
       cooks: {
-        'med_rare': 14,
-        'med': 16,
-        'med_well': 19,
-        'well': 21
+        'well': 1260,
+        'med_well': 1140,
+        'med': 960,
+        'med_rare': 840
       }
     }
   },
   'res_bife_ancho': {
-    'sm': {
-      weight: 500,
-      cooks: {
-        'med_rare': 14,
-        'med': 16,
-        'med_well': 19,
-        'well': 21
-      }
-    },
     'lg': {
       weight: 1000,
       cooks: {
-        'med_rare': 34,
-        'med': [40, 42],
-        'med_well': [45, 48],
-        'well': [50, 55]
+        'well': [3000, 3300],
+        'med_well': [2880, 2700],
+        'med': [2400, 2520],
+        'med_rare': 2040
+      }
+    },
+    'sm': {
+      weight: 500,
+      cooks: {
+        'well': [1320, 1260],
+        'med_well': [1140, 1140],
+        'med': [1020, 960],
+        'med_rare': 840
       }
     }
   },
   'res_lomo': {
-    'sm': {
-      weight: 600,
-      cooks: {
-        'med_rare': [34, 38],
-        'med': [44, 48],
-        'med_well': [48, 53],
-        'well': [54, 59]
-      }
-    },
     'lg': {
       weight: 800,
       cooks: {
-        'med_rare': [36, 40],
-        'med': [46, 50],
-        'med_well': [50, 56],
-        'well': [57, 62]
+        'well': [3720, 3420],
+        'med_well': [3360, 3000],
+        'med': [3000, 2760],
+        'med_rare': [2400, 2160]
+      }
+    },
+    'sm': {
+      weight: 600,
+      cooks: {
+        'well': [3540, 3240],
+        'med_well': [3180, 2880],
+        'med': [2880, 2640],
+        'med_rare': [2280, 2040]
       }
     }
   },
@@ -67,62 +67,62 @@ export const cookData = {
     'sm': {
       weight: 1100,
       cooks: {
-        'med_rare': [40, 42],
-        'med': [42, 48],
-        'med_well': [50, 60],
-        'well': [62, 70]
+        'well': [3720, 4200],
+        'med_well': [3600, 3000],
+        'med': [2880, 2520],
+        'med_rare': [2520, 2400]
       }
     }
   },
   'res_picanha': {
-    'sm': {
-      weight: 1000,
-      cooks: {
-        'med_rare': 42,
-        'med': 48,
-        'med_well': [50, 52],
-        'well': [55, 58]
-      }
-    },
     'lg': {
       weight: 1500,
       cooks: {
-        'med_rare': 45,
-        'med': 50,
-        'med_well': [55, 60],
-        'well': [60, 65]
+        'well': [3600, 3900],
+        'med_well': [3300, 3600],
+        'med': [3000, 3000],
+        'med_rare': 2700
+      }
+    },
+    'sm': {
+      weight: 1000,
+      cooks: {
+        'well': [3480, 3300],
+        'med_well': [3120, 3000],
+        'med': 2880,
+        'med_rare': 2520
       }
     }
   },
   'cerdo_solomillo': {
-    'sm': { weight: 350, cooks: [22, 26] },
-    'md': { weight: 500, cooks: [26, 32] },
-    'lg': { weight: 600, cooks: [34, 44]}
+    'lg': { weight: 600, cooks: [2040, 2640] },
+    'md': { weight: 500, cooks: [1560, 1920] },
+    'sm': { weight: 350, cooks: [1320, 1560] }
   },
-  'cerdo_bondiola': { 'sm': { weight: 1900, cooks: 100 } },
+  'cerdo_bondiola': { 'sm': { weight: 1900, cooks: 6000 } },
   'cerdo_panceta': {
-    'sm': { weight: 450, cooks: [45, 50, 45, 60] },
-    'lg': { weight: 500, cooks: [40, 45, 45, 50]}
+    'lg': { weight: 500, cooks: [2400, 2700, 2700, 3000] },
+    'sm': { weight: 450, cooks: [2700, 3000, 2700, 3600] }
   },
-  'cerdo_costillas': { 'sm': { weight: 1000, cooks: [80, 90, 40, 60] } },
-  'cerdo_picana': { 'sm': { weight: 1500, cooks: [65, 70] }} ,
+  'cerdo_costillas': { 'sm': { weight: 1000, cooks: [4800, 5400, 2400, 3600] } },
+  'cerdo_picana': { 'sm': { weight: 1500, cooks: [3900, 4200] } },
   'cordero_costillar': {
     'sm': {
       weight: 1000,
       cooks: {
-        'med': [12, 14],
-        'med_well': [15, 17],
-        'well': [18, 20]
+        'well': [1200, 1080],
+        'med_well': [1020, 900],
+        'med': [840, 720]
       }
     }
   },
-  'cuy_entero': { 'sm': { weight: 430, cooks: [53, 55] } },
+  'cuy_entero': { 'sm': { weight: 430, cooks: [10, 3180] } },
   'pato_magret': {
     'sm': {
       weight: 300,
       cooks: {
-        'med_rare': [24, 28],
-        'med': [30, 32]
+        'med': [1920, 1800],
+        'med_rare': [1680, 1440]
       }
     }
   }
