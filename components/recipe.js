@@ -1,7 +1,6 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, Pressable, Alert } from 'react-native';
-import CardButton from '../components/cardButton';
+import { StyleSheet, Text, View, Image, Pressable } from 'react-native';
 import { borderRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
+import LinearGradient from 'react-native-linear-gradient';
 import Tag from './tag';
 
 export default function Recipe({ img, title, subtitle, size = 'sm', offset, onPress, duration }) {

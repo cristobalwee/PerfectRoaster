@@ -1,23 +1,22 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
+import { borderRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 
 export default function RadioGroup({ data, selected = 0, onSelect }) {
-  const getSelectedStyle = i => selected === i ? { backgroundColor: colors.white } : null;
+  const getSelectedStyle = i => selected === i ? { backgroundColor: colors.boxBackground } : null;
   const getSelectedOpacity = i => selected === i ? { opacity: 1 } : null;
 
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      marginVertical: spacing.xl
+      padding: spacing.xs,
+      backgroundColor: colors.white,
+      borderRadius: 16
     },
     item: {
-      paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
-      marginBottom: spacing.md,
+      padding: spacing.md,
       width: '100%',
-      borderRadius: 16,
+      borderRadius: borderRadius,
       flex: 1,
       flexDirection: 'row',
       justifyContent: 'flex-start',
@@ -29,7 +28,7 @@ export default function RadioGroup({ data, selected = 0, onSelect }) {
       borderRadius: '50%',
       borderColor: colors.black,
       borderWidth: 2,
-      marginRight: 32,
+      marginRight: spacing.lg,
       flex: 0,
       justifyContent: 'center',
       alignItems: 'center',
@@ -43,21 +42,21 @@ export default function RadioGroup({ data, selected = 0, onSelect }) {
     },
     title: {
       fontFamily: fontFamilies.subhead,
-      fontSize: textSizes.header2
+      fontSize: textSizes.navHeader
     },
     subtitle: {
       fontFamily: fontFamilies.paragraph,
-      fontSize: textSizes.body,
+      fontSize: textSizes.bodySmall,
       marginBottom: 8,
       color: colors.link
     },
     bar: {
       backgroundColor: '#D9D9D9',
       width: 8,
-      height: '100%',
+      height: '90%',
       position: 'absolute',
-      left: spacing.xl + 2,
-      top: -12,
+      left: spacing.xl + 10,
+      top: 24,
       borderRadius: 32,
       overflow: 'hidden',
       flex: 1,
@@ -65,7 +64,7 @@ export default function RadioGroup({ data, selected = 0, onSelect }) {
     },
     innerBar: {
       backgroundColor: colors.black,
-      height: (data.length - selected) * 110
+      height: (data.length - selected) * 70
     }
   });
 
@@ -75,7 +74,7 @@ export default function RadioGroup({ data, selected = 0, onSelect }) {
         <View style={ styles.innerBar }></View>
       </View>
       { data.map((item, i) => (
-        <Pressable key={ i } style={ [styles.item, getSelectedStyle(i)] } onPress={ () => onSelect(i) }>
+        <Pressable key={ i } style={ [styles.item, getSelectedStyle(i), i === data.length - 1 && { marginBottom: 0 }] } onPress={ () => onSelect(i) }>
           <View style={ [styles.radio, getSelectedOpacity(i)] }>
             <View style={ styles.innerRadio}/>
           </View>

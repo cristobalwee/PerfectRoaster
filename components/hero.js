@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, ImageBackground, Dimensions, Pressable, Image }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { fontFamilies, colors, textSizes, spacing } from '../constants/styles';
 
+// https://medium.com/timeless/building-the-animated-sticky-spotify-collapsible-header-with-react-native-and-reanimated-part-i-e47222dfcb85
+
 const windowDimensions = Dimensions.get('window');
 
 export default function Hero({ eyebrow, title, back, background, size = 'lg', rightAction }) {

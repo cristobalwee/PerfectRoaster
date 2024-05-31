@@ -32,12 +32,18 @@ export default function CookSelectionPage({ route, navigation }) {
       backgroundColor: colors.boxBackground,
       padding: spacing.lg,
       paddingBottom: spacing.lg + insets.bottom
+    },
+    subHeading: {
+      fontFamily: fontFamilies.subhead,
+      fontSize: textSizes.navHeader,
+      marginBottom: spacing.xs
     }
   });
 
   return (
     <Fragment>
       <ScrollView style={styles.container}>
+        <Text style={ styles.subHeading }>Cocción</Text>
         <RadioGroup 
           data={ cookVals.map(val => ({ title: cookNames[val], subtitle: 'Temperatura' })) }
           selected={ selected }

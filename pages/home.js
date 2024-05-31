@@ -76,7 +76,7 @@ export default function HomeScreen({ route, navigation }) {
     },
     subHeading: {
       fontFamily: fontFamilies.subhead,
-      fontSize: textSizes.navHeader,
+      fontSize: textSizes.navHeader
     },
     body: {
       fontFamily: fontFamilies.paragraph,
