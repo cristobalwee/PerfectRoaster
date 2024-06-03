@@ -10,12 +10,14 @@ import Animated, {
   Easing
 } from 'react-native-reanimated';
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
+import getTranslation from '../utils/getTranslation';
 
 const PressAnimated = Animated.createAnimatedComponent(Pressable);
 
 export default function BottomSheet({ offsetBottom, title, children, isOpen, backdropOnPress, hasActions }) {
   const offset = useSharedValue(0);
   const [animOffset, setAnimOffset] = useState(0);
+  const translatedTitle = getTranslation(title);
   const styles = StyleSheet.create({
     backdrop: {
       ...StyleSheet.absoluteFillObject,
@@ -54,7 +56,7 @@ export default function BottomSheet({ offsetBottom, title, children, isOpen, bac
     content: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,
-      paddingBottom: hasActions ? 0 : spacing.lg,
+      paddingBottom: hasActions && offsetBottom ? 0 : spacing.lg,
       gap: spacing.md,
       marginBottom: offsetBottom
     }
@@ -99,7 +101,7 @@ export default function BottomSheet({ offsetBottom, title, children, isOpen, bac
           <Image style={ styles.closeIcon } source={ require('../assets/images/icons/close.png') } />
         </Pressable>
         <View style={styles.header}>
-          <Text style={styles.title}>{ title[0].toUpperCase() + title.slice(1) }</Text>
+          <Text style={styles.title}>{ translatedTitle }</Text>
         </View>
         <View style={styles.content}>
           { children }

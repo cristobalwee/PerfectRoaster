@@ -9,29 +9,26 @@ import RadioGroup from '../components/radioGroup';
 
 export default function CookSelectionPage({ route, navigation }) {
   const { cut, weight } = route.params;
-  const [selected, setSelected] = useState(0);
+  const [selectedCook, setSelectedCook] = useState(0);
+  const [selectedWeight, setSelectedWeight] = useState(0);
   const insets = useSafeAreaInsets();
   const cookNames = { med_rare: 'A punto', med: 'Término medio', med_well: 'Medio cocido', well: 'Bien cocido' };
 
   const cookVals = Object.keys(cookData[cut][weight].cooks);
-  const cookId = cookVals[selected];
+  const cookId = cookVals[selectedCook];
   const cook = cookData[cut][weight].cooks[cookId];
   
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.boxBackground,
-      padding: spacing.lg,
-      paddingBottom: 50
+      padding: spacing.lg
     },
     buttonContainer: {
       position: 'absolute',
-      bottom: 0,
-      flex: 1,
-      width: '100%',
-      backgroundColor: colors.boxBackground,
-      padding: spacing.lg,
-      paddingBottom: spacing.lg + insets.bottom
+      bottom: spacing.lg + insets.bottom,
+      left: spacing.lg,
+      right: spacing.lg
     },
     subHeading: {
       fontFamily: fontFamilies.subhead,
@@ -46,9 +43,10 @@ export default function CookSelectionPage({ route, navigation }) {
         <Text style={ styles.subHeading }>Cocción</Text>
         <RadioGroup 
           data={ cookVals.map(val => ({ title: cookNames[val], subtitle: 'Temperatura' })) }
-          selected={ selected }
-          onSelect={ setSelected }
+          selected={ selectedCook }
+          onSelect={ setSelectedCook }
         />
+        <View style={{ marginBottom: 150 + insets.bottom }}></View>
         <StatusBar style="auto" />
       </ScrollView>
       <View style={styles.buttonContainer}>

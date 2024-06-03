@@ -11,6 +11,7 @@ import { Svg, Circle } from 'react-native-svg'
 import { getElapsedTime } from '../utils/getElapsed';
 import BottomSheet from '../components/bottomSheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import getTranslation from '../utils/getTranslation';
 
 // https://dev.to/shivampawar/efficiently-managing-timers-in-a-react-native-app-overcoming-background-foreground-timer-state-issues-map
 // https://github.com/react-native-push-notification/ios
@@ -36,9 +37,19 @@ export default function TimerPage({ route, navigation }) {
   const elapsed = getElapsedTime(startedAt, stoppedAt);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
+  const resetTime = () => {
+    setDone(false);
+    setTime(finalCookTime);
+    setDisplay(finalCookTime);
+    dispatch(stopTimer());
+    dispatch(resetTimer());
+  }
 
   const [sheet, setSheet] = useState(null);
-  const onSheetClose = () => setSheet(null);
+  const onSheetClose = () => {
+    if (sheet === 'listo') resetTime();
+    setSheet(null);
+  }
 
   const styles = StyleSheet.create({
     container: {
@@ -104,6 +115,7 @@ export default function TimerPage({ route, navigation }) {
   const circum = radius * 2 * Math.PI;
 
   const { cut, weight, cook, cookTime } = route.params;
+  const { rest } = 2000;
   const isStarted = startedAt && !stoppedAt && activeCut === cut;
   let finalCookTime;
   
@@ -121,6 +133,7 @@ export default function TimerPage({ route, navigation }) {
   const [displayTime, setDisplay] = useState(finalCookTime  - (trueElapsed * timeOffset)/1000);
 
   useEffect(() => {
+    console.log(sheet);
     if (time < 0.25 && !done) {
       setDone(true);
       setTimeout(() => {
@@ -153,16 +166,16 @@ export default function TimerPage({ route, navigation }) {
 
   const doneContent = [
     <View style={ styles.doneModal }>
-      <Text style={ styles.body }>Tu comida esta lista! Te recomendamos reposar tu carne por 8min</Text>
+      <Text style={ styles.body }>Tu comida esta lista! Te recomendamos reposar tu carne por {rest / 60}min</Text>
       <View style={ styles.doneModalButtonContainer }>
         <Button
           as='primary'
           text='Comenzar reposo'
           onPress={ () => {
             setDone(false);
-            setTime(finalCookTime);
-            setDisplay(finalCookTime);
-            dispatch(startTimer({ cut, finalCookTime }));
+            setTime(rest);
+            setDisplay(rest);
+            dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0 }));
             setSheet(null);
           }}
         />
@@ -170,13 +183,9 @@ export default function TimerPage({ route, navigation }) {
           as='secondary_alt'
           text='Entendido'
           onPress={ () => {
-            setDone(false);
-            setTime(finalCookTime);
-            setDisplay(finalCookTime);
-            dispatch(stopTimer());
-            dispatch(resetTimer());
+            resetTime();
             setSheet(null);
-          } }
+          }}
         />
       </View>
     </View>
@@ -184,7 +193,7 @@ export default function TimerPage({ route, navigation }) {
 
   const cancelContent = [
     <View style={ styles.doneModal }>
-      <Text style={ styles.body }>Estás seguro? Todavía te quedan { formatTime(time) } para terminar tu { cut }</Text>
+      <Text style={ styles.body }>Estás seguro? Todavía te quedan { formatTime(time) } para terminar tu { getTranslation(cut) }</Text>
       <View style={ styles.doneModalButtonContainer }>
         <Button
           as='primary'
@@ -218,7 +227,7 @@ export default function TimerPage({ route, navigation }) {
             setDone(false);
             setTime(finalCookTime);
             setDisplay(finalCookTime);
-            dispatch(startTimer({ cut, finalCookTime, reset: time === finalCookTime, localTime: time }));
+            dispatch(startTimer({ cut, finalCookTime, nextTimer: rest }));
             setSheet(null);
           }}
         />
@@ -299,7 +308,7 @@ export default function TimerPage({ route, navigation }) {
               if (isStarted) {
                 dispatch(stopTimer());
               } else {
-                dispatch(startTimer({ cut, finalCookTime }));
+                dispatch(startTimer({ cut, finalCookTime, nextTimer: rest }));
               }
             } }
             icon={ 
@@ -311,10 +320,10 @@ export default function TimerPage({ route, navigation }) {
         </View>
         <StatusBar style="auto" />
       </ScrollView>
-      <View style={ styles.notice }>
+      {/* <View style={ styles.notice }>
         <Image style={{ width: 24, height: 24 }} source={ require('../assets/images/icons/info.png') } />
         <Text style={{ fontFamily: fontFamilies.paragraph, fontSize: textSizes.bodySmall }}>Tenga en cuenta</Text>
-      </View>
+      </View> */}
       <BottomSheet backdropOnPress={ onSheetClose } isOpen={ sheet } offsetBottom={ insets.bottom } title={ sheet } hasActions>
         { getSheetContent() }
       </BottomSheet>

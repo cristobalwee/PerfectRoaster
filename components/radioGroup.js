@@ -11,7 +11,8 @@ export default function RadioGroup({ data, selected = 0, onSelect }) {
       alignItems: 'center',
       padding: spacing.xs,
       backgroundColor: colors.white,
-      borderRadius: 16
+      borderRadius: 16,
+      marginBottom: spacing.lg
     },
     item: {
       padding: spacing.md,
@@ -55,7 +56,7 @@ export default function RadioGroup({ data, selected = 0, onSelect }) {
       width: 8,
       height: '90%',
       position: 'absolute',
-      left: spacing.xl + 10,
+      left: spacing.xl + 9,
       top: 24,
       borderRadius: 32,
       overflow: 'hidden',

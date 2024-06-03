@@ -9,15 +9,20 @@ import RadioGroup from '../components/radioGroup';
 
 export default function WeightSelectionPage({ route, navigation }) {
   const { cut } = route.params;
-  const [selected, setSelected] = useState(0);
+  const [selectedWeight, setSelectedWeight] = useState(0);
+  const [selectedCook, setSelectedCook] = useState(0);
   const insets = useSafeAreaInsets();
   const weightNames = { sm: 'Pequeño', md: 'Mediano', lg: 'Grande' };
+  const cookNames = { med_rare: 'A punto', med: 'Término medio', med_well: 'Medio cocido', well: 'Bien cocido' };
 
   const cutData = cookData[cut];
   const weightVals = Object.keys(cutData);
-  const weight = weightVals[selected];
-  const cook = cookData[cut][weight].cooks;
+  const weight = weightVals[selectedWeight];
   const nextRoute = (typeof cook === 'object' && !Array.isArray(cook)) ? 'CookSelection' : 'Timer';
+  
+  const cookVals = Object.keys(cookData[cut][weight].cooks);
+  const cookId = cookVals[selectedCook];
+  const cook = cookData[cut][weight].cooks[cookId];
 
   const styles = StyleSheet.create({
     container: {
@@ -27,30 +32,40 @@ export default function WeightSelectionPage({ route, navigation }) {
     },
     buttonContainer: {
       position: 'absolute',
-      bottom: 0,
-      flex: 1,
-      width: '100%',
-      backgroundColor: colors.boxBackground,
-      padding: 36,
-      paddingBottom: 36 + insets.bottom
+      bottom: spacing.lg + insets.bottom,
+      left: spacing.lg,
+      right: spacing.lg
+    },
+    subHeading: {
+      fontFamily: fontFamilies.subhead,
+      fontSize: textSizes.navHeader,
+      marginBottom: spacing.xs
     }
   });
 
   return (
     <Fragment>
       <ScrollView style={styles.container}>
+        <Text style={ styles.subHeading }>Tamaño</Text>
         <RadioGroup 
           data={ weightVals.map(val => ({ title: cutData[val].weight, subtitle: weightNames[val] })) }
-          selected={ selected }
-          onSelect={ setSelected }
+          selected={ selectedWeight }
+          onSelect={ setSelectedWeight }
         />
+        <Text style={ styles.subHeading }>Cocción</Text>
+        <RadioGroup 
+          data={ cookVals.map(val => ({ title: cookNames[val], subtitle: 'Temperatura' })) }
+          selected={ selectedCook }
+          onSelect={ setSelectedCook }
+        />
+        <View style={{ marginBottom: 150 + insets.bottom }}></View>
         <StatusBar style="auto" />
       </ScrollView>
       <View style={styles.buttonContainer}>
         <Button
           as='primary'
           text='Siguiente'
-          onPress={ () => navigation.navigate(nextRoute, { cut, weight, cook }) }
+          onPress={ () => navigation.navigate('Timer', { cut, weight, cook }) }
           arrow
         />
       </View>

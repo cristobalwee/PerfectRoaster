@@ -18,6 +18,7 @@ import { resetTimer, selectActiveCookTime, selectActiveCut, selectStarted, start
 import BottomBar from '../components/bottomBar';
 import getTranslation from '../utils/getTranslation';
 import { selectLocale, setLocale } from '../storageSlice';
+import { locales } from '../locales/locales';
 
 const meatIcons = {
   'pollo': require('../assets/images/icons/pollo.png'),
@@ -32,9 +33,12 @@ export default function HomeScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const [sheet, setSheet] = useState(null);
   const onCardPress = (newSheet) => setSheet(newSheet);
-  const onSheetClose = () => setSheet(null);
+  const onSheetClose = () => {
+    if (sheet === 'listo') dispatch(resetTimer());
+    setSheet(null);
+  };
   const locale = useSelector(selectLocale);
-  const currentDate = getDay();
+  const currentDate = getDay(locale);
   const cardRows = [
     ['pollo', 'res', 'cerdo'],
     ['cordero', 'pato', 'cuy']
@@ -137,10 +141,11 @@ export default function HomeScreen({ route, navigation }) {
     </View>
   ));
 
-  const cutPivots = cuts[sheet] 
+  const cutPivots = cuts[sheet]
     ? cuts[sheet].map(cut => (
       <Pivot
         { ...cut }
+        title={ locales[locale][cut.id] }
         onPress={ () => cut.link(navigation) }
         key={ cut.id }
       />
@@ -149,7 +154,7 @@ export default function HomeScreen({ route, navigation }) {
   
   const settingsPivots = [
     <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>Peso</Text>
+      <Text style={ styles.unitPivotTitle }>{ getTranslation('weight') }</Text>
       <Toggle 
         onSelect={ (selected) => console.log(selected) }
         data={ 
@@ -158,7 +163,7 @@ export default function HomeScreen({ route, navigation }) {
       />
     </View>,
     <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>Temperatura</Text>
+      <Text style={ styles.unitPivotTitle }>{ getTranslation('temp') }</Text>
       <Toggle 
         onSelect={ (selected) => console.log(selected) }
         data={ 
@@ -167,12 +172,12 @@ export default function HomeScreen({ route, navigation }) {
       />
     </View>,
     <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>Lenguaje</Text>
+      <Text style={ styles.unitPivotTitle }>{ getTranslation('lang') }</Text>
       <Toggle 
         onSelect={ (selected) => dispatch(setLocale(selected)) }
         selected={ locale === 'en_US' ? 1 : 0 }
         data={ 
-          [{ text: getTranslation('spanish'), id: 'es_PE' }, { text: getTranslation('english'), id: 'en_US' }] 
+          [{ text: 'Español', id: 'es_PE' }, { text: 'English', id: 'en_US' }] 
         }
       />
     </View>

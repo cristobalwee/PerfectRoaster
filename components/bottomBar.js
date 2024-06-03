@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useIsFocused } from '@react-navigation/native';
 import { getElapsedTime } from '../utils/getElapsed';
 import { useDispatch, useSelector } from 'react-redux';
+import getTranslation from '../utils/getTranslation';
 
 export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   const styles = StyleSheet.create({
@@ -90,7 +91,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   return (
     <View style={ styles.container }>
       <View style={ styles.timeContainer }>
-        <Text style={styles.subtitle}>{ activeCut }</Text>
+        <Text style={styles.subtitle}>{ getTranslation(activeCut) }</Text>
         <Text style={ styles.time }>{ formattedTime } </Text>
       </View>
       <View style={ styles.actions }>

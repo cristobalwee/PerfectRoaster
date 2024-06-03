@@ -20,7 +20,8 @@ export const colors = {
   black: '#2F2E2E',
   border: '#E6E6E6',
   dark: '#000',
-  link: '#444'
+  link: '#444',
+  beige: '#E6D6C0'
 };
 
 export const spacing = {

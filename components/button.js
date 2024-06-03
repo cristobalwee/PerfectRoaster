@@ -4,14 +4,23 @@ import { borderRadius, colors, fontFamilies, spacing, textSizes } from '../const
 export default function Button({ text, icon, as, fullWidth = false, onPress, arrow }) {
   const backgroundColors = {
     'primary': colors.black,
+    'primary_alt': colors.beige,
     'secondary': colors.white,
     'secondary_alt': colors.boxBackground
   };
   const foregroundColors = {
     'primary': colors.white,
+    'primary_alt': colors.dark,
     'secondary': colors.dark,
     'secondary_alt': colors.dark
   };
+  const getArrow = () => {
+    if (arrow) {
+      return as === 'primary_alt' || 'secondary' || 'secondary_alt' 
+        ? <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right.png') } />
+        : <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right-light.png') } />
+    }
+  }
 
   if (as === 'link') {
     return (
@@ -61,7 +70,7 @@ export default function Button({ text, icon, as, fullWidth = false, onPress, arr
       <View style={styles.content}>
         { icon }
         <Text style={styles.text}>{ text }</Text>
-        { arrow &&  <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right-light.png') } /> }
+        { getArrow() }
       </View>
     </Pressable>
   );
