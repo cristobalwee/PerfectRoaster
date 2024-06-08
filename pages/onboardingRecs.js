@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getTranslation from '../utils/getTranslation';
@@ -52,6 +53,11 @@ export default function OnboardingRecs({ navigation }) {
       gap: spacing.md
     }
   });
+  
+  const onPressFinish = async () => {
+    await AsyncStorage.setItem('ONBOARDED', 'true');
+  };
+
   return (
     <View style={styles.container}>
       <Image style={{ height: 55, width: 46 }} source={ require('../assets/images/logo_flame.png') } />
@@ -76,6 +82,7 @@ export default function OnboardingRecs({ navigation }) {
           as='primary_alt'
           text={ getTranslation('begin') }
           onPress={ () => {
+            onPressFinish();
             navigation.navigate('Home');
             dispatch(setOnboarded());
           }}

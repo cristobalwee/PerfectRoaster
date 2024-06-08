@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, Pressable, Alert } from 'react-native';
-import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
+import { circleRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import { startTimer, selectActiveCookTime, selectActiveCut, selectStarted, selectStopped, stopTimer } from '../timerSlice';
 import { useState, useEffect } from 'react';
 import { useIsFocused } from '@react-navigation/native';
@@ -42,7 +42,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
       height: 36,
       justifyContent: 'center',
       alignItems: 'center',
-      borderRadius: '50%',
+      borderRadius: circleRadius,
       backgroundColor: colors.white,
       marginLeft: spacing.sm
     }

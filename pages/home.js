@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, ScrollView, View, Text, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import CardButton from '../components/cardButton';
 import Hero from '../components/hero';
 import { colors, fontFamilies, spacing, textSizes, borderRadius } from '../constants/styles';
@@ -17,8 +18,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resetTimer, selectActiveCookTime, selectActiveCut, selectStarted, startTimer, stopTimer } from '../timerSlice';
 import BottomBar from '../components/bottomBar';
 import getTranslation from '../utils/getTranslation';
-import { selectLocale, setLocale } from '../storageSlice';
+import { selectLocale, selectTempUnits, selectWeightUnits, setLocale, setTempUnits, setWeightUnits } from '../storageSlice';
 import { locales } from '../locales/locales';
+import { setLocaleEN } from '../utils/setLocaleEN';
+import { setTempF, setWeightLbs } from '../utils/setUnits';
 
 const meatIcons = {
   'pollo': require('../assets/images/icons/pollo.png'),
@@ -38,6 +41,8 @@ export default function HomeScreen({ route, navigation }) {
     setSheet(null);
   };
   const locale = useSelector(selectLocale);
+  const tempUnits = useSelector(selectTempUnits);
+  const weightUnits = useSelector(selectWeightUnits);
   const currentDate = getDay(locale);
   const cardRows = [
     ['pollo', 'res', 'cerdo'],
@@ -108,7 +113,16 @@ export default function HomeScreen({ route, navigation }) {
       marginTop: spacing.lg
     }
   });
-  
+
+  const clearAll = async () => {
+    try {
+      await AsyncStorage.clear()
+    } catch(e) {
+      console.log(e);
+    }
+
+    console.log('Done.');
+  }
 
   useEffect(() => {
     if (activeCut) setSheet(null);
@@ -156,16 +170,24 @@ export default function HomeScreen({ route, navigation }) {
     <View style={ styles.unitPivot }>
       <Text style={ styles.unitPivotTitle }>{ getTranslation('weight') }</Text>
       <Toggle 
-        onSelect={ (selected) => console.log(selected) }
+        onSelect={ (selected) => {
+          setWeightLbs(selected ? 'false' : 'true');
+          dispatch(setWeightUnits(selected));
+        }}
+        selected={ weightUnits === 'weight_lbs' ? 1 : 0 }
         data={ 
-          [{ text: getTranslation('weight_gr'), id: 'weight_grams' }, { text: getTranslation('weight_lbs'), id: 'weight_lbs' }] 
+          [{ text: getTranslation('weight_gr'), id: 'weight_gr' }, { text: getTranslation('weight_lbs'), id: 'weight_lbs' }] 
         }
       />
     </View>,
     <View style={ styles.unitPivot }>
       <Text style={ styles.unitPivotTitle }>{ getTranslation('temp') }</Text>
       <Toggle 
-        onSelect={ (selected) => console.log(selected) }
+        onSelect={ (selected) => {
+          setTempF(selected ? 'false' : 'true');
+          dispatch(setTempUnits(selected));
+        }}
+        selected={ tempUnits === 'temp_fahrenheit' ? 1 : 0 }
         data={ 
           [{ text: 'ºC', id: 'temp_celsius' }, { text: 'ºF', id: 'temp_fahrenheit' }] 
         }
@@ -174,7 +196,10 @@ export default function HomeScreen({ route, navigation }) {
     <View style={ styles.unitPivot }>
       <Text style={ styles.unitPivotTitle }>{ getTranslation('lang') }</Text>
       <Toggle 
-        onSelect={ (selected) => dispatch(setLocale(selected)) }
+        onSelect={ (selected) => {
+          setLocaleEN(selected ? 'false' : 'true');
+          dispatch(setLocale(selected));
+        }}
         selected={ locale === 'en_US' ? 1 : 0 }
         data={ 
           [{ text: 'Español', id: 'es_PE' }, { text: 'English', id: 'en_US' }] 
@@ -238,6 +263,7 @@ export default function HomeScreen({ route, navigation }) {
         <ScrollView horizontal>
           { renderRecipes }
         </ScrollView>
+        <Button as='link' text='Clear' onPress={ clearAll } />
         <View style={{ height: 36 + insets.bottom }}></View>
         <StatusBar style='light' />
       </ScrollView>

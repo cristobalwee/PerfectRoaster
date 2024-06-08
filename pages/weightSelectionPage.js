@@ -6,11 +6,18 @@ import Button from '../components/button';
 import { cookData } from '../data/cookData';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RadioGroup from '../components/radioGroup';
+import { useSelector } from 'react-redux';
+import { selectTempUnits, selectWeightUnits } from '../storageSlice';
 
 export default function WeightSelectionPage({ route, navigation }) {
   const { cut } = route.params;
   const [selectedWeight, setSelectedWeight] = useState(0);
   const [selectedCook, setSelectedCook] = useState(0);
+
+  const tempUnits = useSelector(selectTempUnits);
+  const weightUnits = useSelector(selectWeightUnits);
+  const weightUnitVals = { 'weight_gr' : 'g', 'weight_lbs': 'lbs' };
+  const weightMultiplier = weightUnits === 'weight_lbs' ? 0.0022 : 1;
   const insets = useSafeAreaInsets();
   const weightNames = { sm: 'Pequeño', md: 'Mediano', lg: 'Grande' };
   const cookNames = { med_rare: 'A punto', med: 'Término medio', med_well: 'Medio cocido', well: 'Bien cocido' };
@@ -18,11 +25,12 @@ export default function WeightSelectionPage({ route, navigation }) {
   const cutData = cookData[cut];
   const weightVals = Object.keys(cutData);
   const weight = weightVals[selectedWeight];
-  const nextRoute = (typeof cook === 'object' && !Array.isArray(cook)) ? 'CookSelection' : 'Timer';
   
-  const cookVals = Object.keys(cookData[cut][weight].cooks);
+  const cutCooks = cookData[cut][weight].cooks
+  const cookVals = Object.keys(cutCooks);
   const cookId = cookVals[selectedCook];
   const cook = cookData[cut][weight].cooks[cookId];
+  const showCooks = typeof cutCooks === 'object' && !Array.isArray(cutCooks) && cutCooks !== null;
 
   const styles = StyleSheet.create({
     container: {
@@ -48,17 +56,21 @@ export default function WeightSelectionPage({ route, navigation }) {
       <ScrollView style={styles.container}>
         <Text style={ styles.subHeading }>Tamaño</Text>
         <RadioGroup 
-          data={ weightVals.map(val => ({ title: cutData[val].weight, subtitle: weightNames[val] })) }
+          data={ weightVals.map(val => ({ title: `${Math.round(cutData[val].weight * weightMultiplier * 10) / 10}${weightUnitVals[weightUnits]}`, subtitle: weightNames[val] })) }
           selected={ selectedWeight }
           onSelect={ setSelectedWeight }
         />
-        <Text style={ styles.subHeading }>Cocción</Text>
-        <RadioGroup 
-          data={ cookVals.map(val => ({ title: cookNames[val], subtitle: 'Temperatura' })) }
-          selected={ selectedCook }
-          onSelect={ setSelectedCook }
-        />
-        <View style={{ marginBottom: 150 + insets.bottom }}></View>
+        { showCooks && (
+          <>
+            <Text style={ styles.subHeading }>Cocción</Text>
+            <RadioGroup 
+              data={ cookVals.map(val => ({ title: cookNames[val], subtitle: 'Temperatura' })) }
+              selected={ selectedCook }
+              onSelect={ setSelectedCook }
+            />
+            <View style={{ marginBottom: 150 + insets.bottom }}></View>
+          </>
+        )}
         <StatusBar style="auto" />
       </ScrollView>
       <View style={styles.buttonContainer}>

@@ -33,3 +33,4 @@ export const spacing = {
 };
 
 export const borderRadius = 12;
+export const circleRadius = 240;

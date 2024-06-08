@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { borderRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
+import { borderRadius, circleRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 
 export default function RadioGroup({ data, selected = 0, onSelect }) {
   const getSelectedStyle = i => selected === i ? { backgroundColor: colors.boxBackground } : null;
@@ -26,7 +26,7 @@ export default function RadioGroup({ data, selected = 0, onSelect }) {
     radio: {
       width: 30,
       height: 30,
-      borderRadius: '50%',
+      borderRadius: circleRadius,
       borderColor: colors.black,
       borderWidth: 2,
       marginRight: spacing.lg,
@@ -38,7 +38,7 @@ export default function RadioGroup({ data, selected = 0, onSelect }) {
     innerRadio: {
       width: 24,
       height: 24,
-      borderRadius: '50%',
+      borderRadius: circleRadius,
       backgroundColor: colors.black,
     },
     title: {

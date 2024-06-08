@@ -4,13 +4,22 @@ export const storageSlice = createSlice({
   name: 'storage',
   initialState: {
     locale: 'es_PE',
+    tempUnits: 'temp_celsius',
+    weightUnits: 'weight_gr',
     onboarded: false
   },
   reducers: {
     setLocale: (state, action) => {
       const { payload } = action;
-      console.log(payload);
       state.locale = payload;
+    },
+    setTempUnits: (state, action) => {
+      const { payload } = action;
+      state.tempUnits = payload;
+    },
+    setWeightUnits: (state, action) => {
+      const { payload } = action;
+      state.weightUnits = payload;
     },
     setOnboarded: (state) => {
       state.onboarded = true;
@@ -18,11 +27,13 @@ export const storageSlice = createSlice({
   },
   selectors: {
     selectLocale: (sliceState) => sliceState.locale,
-    selectOnboarded: (sliceState) => sliceState.onboarded
+    selectOnboarded: (sliceState) => sliceState.onboarded,
+    selectTempUnits: (sliceState) => sliceState.tempUnits,
+    selectWeightUnits: (sliceState) => sliceState.weightUnits
   }
 });
 
-export const { setLocale, setOnboarded } = storageSlice.actions;
-export const { selectLocale, selectOnboarded } = storageSlice.selectors;
+export const { setLocale, setTempUnits, setWeightUnits, setOnboarded } = storageSlice.actions;
+export const { selectLocale, selectOnboarded, selectTempUnits, selectWeightUnits } = storageSlice.selectors;
 
 export default storageSlice.reducer;

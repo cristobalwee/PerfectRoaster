@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ImageBackground, Dimensions, Pressable, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { fontFamilies, colors, textSizes, spacing } from '../constants/styles';
+import { fontFamilies, colors, textSizes, spacing, circleRadius } from '../constants/styles';
 
 // https://medium.com/timeless/building-the-animated-sticky-spotify-collapsible-header-with-react-native-and-reanimated-part-i-e47222dfcb85
 
@@ -40,7 +40,7 @@ export default function Hero({ eyebrow, title, back, background, size = 'lg', ri
       width: 36,
       height: 36,
       backgroundColor: colors.white,
-      borderRadius: '50%',
+      borderRadius: circleRadius,
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
@@ -56,7 +56,7 @@ export default function Hero({ eyebrow, title, back, background, size = 'lg', ri
       width: 52,
       height: 52,
       backgroundColor: colors.white,
-      borderRadius: '50%',
+      borderRadius: circleRadius,
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',

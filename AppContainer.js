@@ -1,7 +1,5 @@
 import { Pressable, StyleSheet, Text, View, Image } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from './pages/home';
 import RecipesScreen from './pages/recipes';
 import { fontFamilies, spacing, textSizes } from './constants/styles';
@@ -12,7 +10,9 @@ import TimerPage from './pages/timer';
 import OnboardingLocales from './pages/onboardingLocale';
 import OnboardingIntro from './pages/onboardingIntro';
 import OnboardingRecs from './pages/onboardingRecs';
-import { selectOnboarded } from './storageSlice';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLocale, setTempUnits, setWeightUnits } from './storageSlice';
 
 // https://www.reactnative.university/blog/live-activities-unleashed
 // https://medium.com/@rafiulansari/building-a-react-native-app-part-iv-onboarding-screens-6ef48caefd6c 
@@ -20,13 +20,23 @@ import { selectOnboarded } from './storageSlice';
 
 const Stack = createNativeStackNavigator();
 
-export default function AppContainer() {
-  const onboarded = useSelector(selectOnboarded);
+export default function AppContainer({ onboarded, locale, tempUnits, weightUnits }) {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const formatLocale = locale ? 'en_US' : 'es_PE';
+    const formatTemp = tempUnits ? 'temp_fahrenheit' : 'temp_celsius';
+    const formatWeight = weightUnits ? 'weight_lbs' : 'weight_gr';
+
+    dispatch(setLocale(formatLocale));
+    dispatch(setTempUnits(formatTemp));
+    dispatch(setWeightUnits(formatWeight));
+  });
+
   const getBackButton = (back) => (
     <Pressable onPress={ back }>
       <Image style={{ width: 24, height: 24 }} source={ require('./assets/images/icons/chevron-left.png') } />
     </Pressable>
-  )
+  );
 
   return (
     <Stack.Navigator initialRouteName={ onboarded ? 'Home' : 'OnboardingLocale' }>

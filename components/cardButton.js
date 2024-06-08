@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
-import { fontFamilies, colors, textSizes, spacing, borderRadius } from '../constants/styles';
+import { fontFamilies, colors, textSizes, spacing, borderRadius, circleRadius } from '../constants/styles';
 
 const styles = StyleSheet.create({
   container: {
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 56,
     height: 56,
-    borderRadius: '50%',
+    borderRadius: circleRadius,
     backgroundColor: colors.black,
     flex: 1,
     alignItems: 'center',

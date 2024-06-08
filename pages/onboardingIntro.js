@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import Button from '../components/button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Video from 'react-native-video';
 import getTranslation from '../utils/getTranslation';
 
 // https://www.codedaily.io/tutorials/Create-a-Looping-Background-Video-with-React-Native-Video
@@ -20,6 +21,10 @@ export default function OnboardingIntro({ navigation }) {
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: 'gray'
+    },
+    video: {
+      height: '100%',
+      width: '100%'
     },
     contentContainer: {
       flex: 4,
@@ -50,6 +55,13 @@ export default function OnboardingIntro({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={ styles.videoContainer }>
+      <Video 
+        source={ require('../assets/intro_video.mp4') }                             
+        onBuffer={ () => console.log('buffer') }          
+        onError={ () => console.log('error') }               
+        style={styles.video}
+        repeat
+      />
       </View>
       <View style={ styles.contentContainer }>
         <Text style={ styles.eyebrow }>{ getTranslation('welcome') }</Text>

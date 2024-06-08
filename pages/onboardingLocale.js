@@ -1,8 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { colors, spacing } from '../constants/styles';
-import { recipeList } from '../data/recipes';
-import Recipe from '../components/recipe';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { setLocale } from '../storageSlice';
@@ -35,6 +34,11 @@ export default function OnboardingLocales({ navigation }) {
       gap: spacing.md
     }
   });
+
+  const setLocaleEN = async (locale) => {
+    await AsyncStorage.setItem('LOCALE', locale);
+  };
+
   return (
     <View style={styles.container}>
       <View style={ styles.imgContainer }>
@@ -45,6 +49,7 @@ export default function OnboardingLocales({ navigation }) {
           as='primary_alt'
           text='Español'
           onPress={ () => {
+            setLocaleEN('false');
             dispatch(setLocale('es_PE'));
             navigation.navigate('OnboardingIntro');
           }}
@@ -54,6 +59,7 @@ export default function OnboardingLocales({ navigation }) {
           as='primary_alt'
           text='English'
           onPress={ () => {
+            setLocaleEN('true');
             dispatch(setLocale('en_US'));
             navigation.navigate('OnboardingIntro');
           }}

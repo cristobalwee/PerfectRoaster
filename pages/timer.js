@@ -86,7 +86,7 @@ export default function TimerPage({ route, navigation }) {
       bottom: spacing.sm + insets.bottom,
       left: spacing.lg,
       right: spacing.lg,
-      borderRadius: borderRadius,
+      borderRadius: 16,
       backgroundColor: colors.white,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.md,
@@ -320,10 +320,10 @@ export default function TimerPage({ route, navigation }) {
         </View>
         <StatusBar style="auto" />
       </ScrollView>
-      {/* <View style={ styles.notice }>
+      <View style={ styles.notice }>
         <Image style={{ width: 24, height: 24 }} source={ require('../assets/images/icons/info.png') } />
-        <Text style={{ fontFamily: fontFamilies.paragraph, fontSize: textSizes.bodySmall }}>Tenga en cuenta</Text>
-      </View> */}
+        <Text style={{ fontFamily: fontFamilies.paragraph, fontSize: textSizes.bodySmall }}>Al terminar, repose por 8min</Text>
+      </View>
       <BottomSheet backdropOnPress={ onSheetClose } isOpen={ sheet } offsetBottom={ insets.bottom } title={ sheet } hasActions>
         { getSheetContent() }
       </BottomSheet>
