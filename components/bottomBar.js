@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, Pressable, Alert } from 'react-native';
 import { circleRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
-import { startTimer, selectActiveCookTime, selectActiveCut, selectStarted, selectStopped, stopTimer } from '../timerSlice';
+import { startTimer, selectActiveCookTime, selectActiveCut, selectStarted, selectStopped, stopTimer, selectTimerType, selectNextTimer, selectNextType } from '../timerSlice';
 import { useState, useEffect } from 'react';
 import { useIsFocused } from '@react-navigation/native';
 import { getElapsedTime } from '../utils/getElapsed';
@@ -54,6 +54,9 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   const elapsed = getElapsedTime(startedAt, stoppedAt);
   const activeCut = useSelector(selectActiveCut);
   const activeCookTime = useSelector(selectActiveCookTime);
+  const nextTimer = useSelector(selectNextTimer);
+  const nextTimerType = useSelector(selectNextType);
+  const timerType = useSelector(selectTimerType);
 
   const [time, setTime] = useState(activeCookTime - elapsed/1000);
   const [firstLoad, setFirstLoad] = useState(true);
@@ -91,7 +94,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   return (
     <View style={ styles.container }>
       <View style={ styles.timeContainer }>
-        <Text style={styles.subtitle}>{ getTranslation(activeCut) }</Text>
+        <Text style={styles.subtitle}>{ getTranslation(activeCut) } – { timerType || 'cook' }</Text>
         <Text style={ styles.time }>{ formattedTime } </Text>
       </View>
       <View style={ styles.actions }>
@@ -99,7 +102,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
           style={ styles.iconButton }
           onPress={ () => {
             if (isStopped) {
-              dispatch(startTimer({ cut: activeCut, finalCookTime: activeCookTime, reset: time === activeCookTime }))
+              dispatch(startTimer({ cut: activeCut, finalCookTime: activeCookTime, type: timerType, nextTimer, nextTimerType }))
             } else {
               dispatch(stopTimer())
             }

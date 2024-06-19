@@ -15,13 +15,13 @@ import { recipeList } from '../data/recipes';
 import Button from '../components/button';
 import Toggle from '../components/toggle';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetTimer, selectActiveCookTime, selectActiveCut, selectStarted, startTimer, stopTimer } from '../timerSlice';
+import { resetTimer, selectActiveCookTime, selectActiveCut, selectNextTimer, selectStarted, startTimer, stopTimer } from '../timerSlice';
 import BottomBar from '../components/bottomBar';
 import getTranslation from '../utils/getTranslation';
 import { selectLocale, selectTempUnits, selectWeightUnits, setLocale, setTempUnits, setWeightUnits } from '../storageSlice';
 import { locales } from '../locales/locales';
 import { setLocaleEN } from '../utils/setLocaleEN';
-import { setTempF, setWeightLbs } from '../utils/setUnits';
+import { setTemp, setWeight } from '../utils/setUnits';
 
 const meatIcons = {
   'pollo': require('../assets/images/icons/pollo.png'),
@@ -54,6 +54,7 @@ export default function HomeScreen({ route, navigation }) {
   const activeCut = useSelector(selectActiveCut);
   const activeCookTime = useSelector(selectActiveCookTime);
   const isStarted = startedAt && activeCut;
+  const nextTimer = useSelector(selectNextTimer);
 
   const styles = StyleSheet.create({
     container: {
@@ -171,7 +172,7 @@ export default function HomeScreen({ route, navigation }) {
       <Text style={ styles.unitPivotTitle }>{ getTranslation('weight') }</Text>
       <Toggle 
         onSelect={ (selected) => {
-          setWeightLbs(selected ? 'false' : 'true');
+          setWeight(selected ? 'weight_lbs' : 'weight_gr');
           dispatch(setWeightUnits(selected));
         }}
         selected={ weightUnits === 'weight_lbs' ? 1 : 0 }
@@ -184,7 +185,7 @@ export default function HomeScreen({ route, navigation }) {
       <Text style={ styles.unitPivotTitle }>{ getTranslation('temp') }</Text>
       <Toggle 
         onSelect={ (selected) => {
-          setTempF(selected ? 'false' : 'true');
+          setTemp(selected ? 'temp_fahrenheit' : 'temp_celsius');
           dispatch(setTempUnits(selected));
         }}
         selected={ tempUnits === 'temp_fahrenheit' ? 1 : 0 }
@@ -197,7 +198,7 @@ export default function HomeScreen({ route, navigation }) {
       <Text style={ styles.unitPivotTitle }>{ getTranslation('lang') }</Text>
       <Toggle 
         onSelect={ (selected) => {
-          setLocaleEN(selected ? 'false' : 'true');
+          setLocaleEN(selected ? 'true': 'false');
           dispatch(setLocale(selected));
         }}
         selected={ locale === 'en_US' ? 1 : 0 }
@@ -216,7 +217,8 @@ export default function HomeScreen({ route, navigation }) {
           as='primary'
           text='Comenzar reposo'
           onPress={ () => {
-            dispatch(startTimer({ cut: 'pato_magret', finalCookTime: 1920 }));
+            dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, type: 'rest', nextTimer: 0, nextTimerType: null }));
+            navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer });
             setSheet(null);
           }}
         />
@@ -257,7 +259,7 @@ export default function HomeScreen({ route, navigation }) {
           { renderCards }
         </View>
         <View style={ styles.subHeadingContainer }>
-          <Text style={ styles.subHeading }>Recetas</Text>
+          <Text style={ styles.subHeading }>{ getTranslation('recipes') }</Text>
           <Button as='link' text='Ver más' onPress={ () => navigation.navigate('Recipes') } />
         </View>
         <ScrollView horizontal>
@@ -279,7 +281,7 @@ export default function HomeScreen({ route, navigation }) {
       { isStarted && (
         <BottomBar
           offsetBottom={ insets.bottom }
-          onLink={ () => navigation.navigate('Timer', { cut: activeCut, cookTime: activeCookTime }) }
+          onLink={ () => navigation.navigate('Timer', { cut: activeCut, cookTime: activeCookTime, shouldStart: true }) }
           onDone={ () => setSheet('listo') }
           onBlur={ setFirstLoad => {
             navigation.addListener('blur', () => {

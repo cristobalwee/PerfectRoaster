@@ -27,6 +27,7 @@ export const locales = {
     'temp': 'Temperatura',
     'lang': 'Lenguaje',
     'cancelar': 'Cancelar',
+    'siguiente_paso': 'Siguiente Paso',
 
     pollo_entero: 'Pollo Entero',
     pollo_pechuga: 'Pechuga de Pollo',
@@ -73,6 +74,7 @@ export const locales = {
     'temp': 'Temperature',
     'lang': 'Language',
     'cancelar': 'Cancel',
+    'siguiente_paso': 'Next Step',
 
     pollo_entero: 'Whole Chicken',
     pollo_pechuga: 'Chicken Breast',

@@ -1,9 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, ScrollView, View, Dimensions, Image, Alert } from 'react-native';
 import { useIsFocused } from '@react-navigation/native'
-import { borderRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
+import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { startTimer, stopTimer, resetTimer, selectStarted, selectStopped, selectActiveCut, selectActiveCookTime } from '../timerSlice';
+import { startTimer, stopTimer, resetTimer, selectStarted, selectStopped, selectActiveCut, selectActiveCookTime, selectTimerType, selectNextTimer, selectNextType } from '../timerSlice';
+import notifee, { TriggerType } from '@notifee/react-native';
 import Button from '../components/button';
 import { cookData } from '../data/cookData';
 import { useEffect, useState } from 'react';
@@ -23,10 +24,11 @@ const windowDimensions = Dimensions.get('window');
 const getValues = (val) => {
   return Array.isArray(val) ? val[0] : val;
 };
+
 const formatTime = time => {
   const sliceIdx = time / 60 > 60 ? 11 : 14;
   return new Date(time * 1000).toISOString().substring(sliceIdx, 19);
-}
+};
 
 export default function TimerPage({ route, navigation }) {
   const dispatch = useDispatch();
@@ -34,6 +36,9 @@ export default function TimerPage({ route, navigation }) {
   const stoppedAt = useSelector(selectStopped);
   const activeCut = useSelector(selectActiveCut);
   const activeCookTime = useSelector(selectActiveCookTime);
+  const timerType = useSelector(selectTimerType);
+  const nextTimerType = useSelector(selectNextType);
+  const nextTimer = useSelector(selectNextTimer);
   const elapsed = getElapsedTime(startedAt, stoppedAt);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
@@ -49,7 +54,7 @@ export default function TimerPage({ route, navigation }) {
   const onSheetClose = () => {
     if (sheet === 'listo') resetTime();
     setSheet(null);
-  }
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -114,10 +119,10 @@ export default function TimerPage({ route, navigation }) {
   const radius = (size - strokeWidth) / 2;
   const circum = radius * 2 * Math.PI;
 
-  const { cut, weight, cook, cookTime } = route.params;
-  const { rest } = 2000;
+  const { cut, weight, cook, cookTime, shouldStart } = route.params;
   const isStarted = startedAt && !stoppedAt && activeCut === cut;
-  let finalCookTime;
+  const hasNextStep = (cut === 'cerdo_costillas' || cut === 'cerdo_panceta') && nextTimerType !== 'rest';
+  let finalCookTime, rest, step2;
   
   if (cookTime) {
     finalCookTime = cookTime;
@@ -125,24 +130,71 @@ export default function TimerPage({ route, navigation }) {
     finalCookTime = cook ? getValues(cook) : getValues(cookData[cut][weight].cooks);
   }
 
+  if (typeof finalCookTime === 'object') {
+    step2 = finalCookTime.step2[0];
+    finalCookTime = finalCookTime.step1[0];
+  }
+
+  if (cut && weight) {
+    rest = cookData[cut][weight].rest;
+  } else {
+    if (nextTimer && nextTimerType === 'rest') rest = nextTimer;
+  }
+
   const timeOffset = 100/finalCookTime;
   const trueElapsed = activeCut === cut ? elapsed : 0;
   const [time, setTime] = useState(finalCookTime - trueElapsed/1000);
   const [firstLoad, setFirstLoad] = useState(true);
+  const [localShouldStart, setShouldStart] = useState(shouldStart);
   const [done, setDone] = useState(false);
   const [displayTime, setDisplay] = useState(finalCookTime  - (trueElapsed * timeOffset)/1000);
 
+  const nextNotice = hasNextStep ? `Siguiente paso: ${step2}min a fuego alto` : `Al terminar, repose por ${rest/60}min`;
+
+  async function onDisplayNotification() {
+    await notifee.requestPermission({ criticalAlert: true });
+    const trigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: Date.now() + (finalCookTime * 1000) + 250
+    };
+
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+    });
+
+    await notifee.createTriggerNotification({
+      title: 'Listo!',
+      body: 'Tu comida está lista',
+      android: {
+        channelId,
+        pressAction: {
+          id: 'default',
+        },
+      },
+      ios: {
+        interruptionLevel: 'timeSensitive',
+        critical: true,
+        sound: 'default'
+      }
+    }, trigger);
+  };
+
   useEffect(() => {
-    console.log(sheet);
+    console.log(timerType, nextTimerType);
     if (time < 0.25 && !done) {
       setDone(true);
       setTimeout(() => {
-        setSheet('listo');
+        if (hasNextStep) {
+          setSheet('siguiente_paso');
+        } else {
+          setSheet('listo');
+        }
       }, 250);
-    }
+    };
 
     const interval = setInterval(() => {
-      if (time > 0.25 && isStarted && isFocused) {
+      if (time > 0.25 && (isStarted && localShouldStart) && isFocused) {
         setTime(finalCookTime - trueElapsed / 1000);
         setDisplay(finalCookTime  - (trueElapsed * timeOffset)/1000);
       }
@@ -152,7 +204,7 @@ export default function TimerPage({ route, navigation }) {
   });
 
   useEffect(() => {
-    if (isFocused && firstLoad) {
+    if (isFocused && firstLoad && shouldStart) {
       setTime(finalCookTime - trueElapsed / 1000);
       setFirstLoad(false);
     }
@@ -166,22 +218,57 @@ export default function TimerPage({ route, navigation }) {
 
   const doneContent = [
     <View style={ styles.doneModal }>
-      <Text style={ styles.body }>Tu comida esta lista! Te recomendamos reposar tu carne por {rest / 60}min</Text>
+      <Text style={ styles.body }>Tu comida esta lista! { nextTimer ? `Te recomendamos reposar tu carne por ${rest / 60}min` : 'Disfruta y no te olvides de limpiar tu Roaster.'}</Text>
+      <View style={ styles.doneModalButtonContainer }>
+        { nextTimer ? (
+          <Button
+            as='primary'
+            text='Comenzar reposo'
+            onPress={ () => {
+              setDone(false);
+              setTime(rest);
+              setDisplay(rest);
+              navigation.navigate('Timer', { cut: activeCut, cookTime: rest });
+              dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0, type: 'rest', nextTimerType: null }));
+              setShouldStart(true);
+              setSheet(null);
+            }}
+          />
+        ) : null }
+        <Button
+          as='secondary_alt'
+          text='Entendido'
+          onPress={ () => {
+            resetTime();
+            setSheet(null);
+
+            if (!nextTimer) navigation.navigate('Home');
+          }}
+        />
+      </View>
+    </View>
+  ];
+
+  const nextContent = [
+    <View style={ styles.doneModal }>
+      <Text style={ styles.body }>Paso 1 completo, retira y limpia receptor de jugos y continua con el siguiente paso a fuego alto.</Text>
       <View style={ styles.doneModalButtonContainer }>
         <Button
           as='primary'
-          text='Comenzar reposo'
+          text='Comenzar siguiente paso'
           onPress={ () => {
             setDone(false);
             setTime(rest);
             setDisplay(rest);
-            dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0 }));
+            navigation.navigate('Timer', { cut: activeCut, cookTime: step2 });
+            dispatch(startTimer({ cut, finalCookTime: step2, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
+            setShouldStart(true);
             setSheet(null);
           }}
         />
         <Button
           as='secondary_alt'
-          text='Entendido'
+          text='Cancelar'
           onPress={ () => {
             resetTime();
             setSheet(null);
@@ -227,7 +314,8 @@ export default function TimerPage({ route, navigation }) {
             setDone(false);
             setTime(finalCookTime);
             setDisplay(finalCookTime);
-            dispatch(startTimer({ cut, finalCookTime, nextTimer: rest }));
+            setShouldStart(true);
+            dispatch(startTimer({ cut, finalCookTime, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
             setSheet(null);
           }}
         />
@@ -246,6 +334,8 @@ export default function TimerPage({ route, navigation }) {
         return cancelContent;
       case 'listo':
         return doneContent;
+      case 'siguiente_paso':
+        return nextContent;
       case 'cancelar presente':
         return resetContent;
       default:
@@ -289,7 +379,7 @@ export default function TimerPage({ route, navigation }) {
             as='secondary'
             text='Cancelar'
             onPress={ () => {
-              if (elapsed > 0) {
+              if (elapsed > 0 && cut === activeCut) {
                 setSheet('cancelar')
               } else {
                 navigation.navigate('Home', { resetState: true });
@@ -308,7 +398,9 @@ export default function TimerPage({ route, navigation }) {
               if (isStarted) {
                 dispatch(stopTimer());
               } else {
-                dispatch(startTimer({ cut, finalCookTime, nextTimer: rest }));
+                setShouldStart(true);
+                dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest' }));
+                // onDisplayNotification();
               }
             } }
             icon={ 
@@ -320,10 +412,12 @@ export default function TimerPage({ route, navigation }) {
         </View>
         <StatusBar style="auto" />
       </ScrollView>
-      <View style={ styles.notice }>
-        <Image style={{ width: 24, height: 24 }} source={ require('../assets/images/icons/info.png') } />
-        <Text style={{ fontFamily: fontFamilies.paragraph, fontSize: textSizes.bodySmall }}>Al terminar, repose por 8min</Text>
-      </View>
+      { (rest || hasNextStep) && (
+        <View style={ styles.notice }>
+          <Image style={{ width: 24, height: 24 }} source={ require('../assets/images/icons/info.png') } />
+          <Text style={{ fontFamily: fontFamilies.paragraph, fontSize: textSizes.bodySmall }}>{ nextNotice }</Text>
+        </View>
+      )}
       <BottomSheet backdropOnPress={ onSheetClose } isOpen={ sheet } offsetBottom={ insets.bottom } title={ sheet } hasActions>
         { getSheetContent() }
       </BottomSheet>

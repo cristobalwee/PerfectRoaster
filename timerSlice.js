@@ -5,7 +5,9 @@ const initialState = {
   stoppedAt: undefined,
   activeCut: null,
   activeCookTime: 0,
-  nextTimer: 0
+  nextTimer: 0,
+  nextTimerType: null,
+  type: null
 };
 
 export const timerSlice = createSlice({
@@ -14,7 +16,7 @@ export const timerSlice = createSlice({
   reducers: {
     startTimer: (state, action) => {
       const now = new Date().getTime();
-      const { payload: { cut, finalCookTime, nextTimer } } = action;
+      const { payload: { cut, finalCookTime, nextTimer, type, nextTimerType } } = action;
       const { startedAt, stoppedAt } = state;
       
       state.startedAt = stoppedAt ? now - (stoppedAt - startedAt): now;
@@ -22,6 +24,8 @@ export const timerSlice = createSlice({
       state.activeCut = cut;
       state.activeCookTime = finalCookTime;
       state.nextTimer = nextTimer;
+      state.nextTimerType = nextTimerType;
+      state.type = type;
     },
     stopTimer: (state) => {
       const now = new Date().getTime();
@@ -34,6 +38,9 @@ export const timerSlice = createSlice({
       state.stoppedAt = stoppedAt ? now : undefined;
       state.activeCut = null;
       state.activeCookTime = 0;
+      state.nextTimer = 0;
+      state.nextTimerType = null;
+      state.type = null;
     }
   },
   selectors: {
@@ -42,11 +49,22 @@ export const timerSlice = createSlice({
     selectActiveCut: (sliceState) => sliceState.activeCut,
     selectActiveCookTime: (sliceState) => sliceState.activeCookTime,
     selectLocalTime: (sliceState) => sliceState.localTime,
-    selectNextTimer: (sliceState) => sliceState.nextTimer
+    selectNextTimer: (sliceState) => sliceState.nextTimer,
+    selectNextType: (sliceState) => sliceState.nextTimerType,
+    selectTimerType: (sliceState) => sliceState.type
   }
 });
 
 export const { startTimer, stopTimer, resetTimer } = timerSlice.actions;
-export const { selectStarted, selectStopped, selectActiveCut, selectActiveCookTime, selectLocalTime, selectNextTimer } = timerSlice.selectors;
+export const {
+  selectStarted,
+  selectStopped,
+  selectActiveCut,
+  selectActiveCookTime,
+  selectLocalTime,
+  selectNextTimer,
+  selectNextType,
+  selectTimerType
+} = timerSlice.selectors;
 
 export default timerSlice.reducer;

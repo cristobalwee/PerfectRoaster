@@ -15,11 +15,12 @@ export default function Button({ text, icon, as, fullWidth = false, onPress, arr
     'secondary_alt': colors.dark
   };
   const getArrow = () => {
-    if (arrow) {
-      return as === 'primary_alt' || 'secondary' || 'secondary_alt' 
-        ? <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right.png') } />
-        : <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right-light.png') } />
-    }
+    if (as === 'primary_alt' || as === 'secondary' || as === 'secondary_alt' ) {
+      return <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right.png') } />;
+    };
+
+
+    return <Image style={{ width: 20, height: 20 }} source={ require('../assets/images/icons/chevron-right-light.png') } />;
   }
 
   if (as === 'link') {
@@ -70,7 +71,7 @@ export default function Button({ text, icon, as, fullWidth = false, onPress, arr
       <View style={styles.content}>
         { icon }
         <Text style={styles.text}>{ text }</Text>
-        { getArrow() }
+        { arrow && getArrow() }
       </View>
     </Pressable>
   );

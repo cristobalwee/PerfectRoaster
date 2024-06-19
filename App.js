@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 // https://www.reactnative.university/blog/live-activities-unleashed
 // https://medium.com/@rafiulansari/building-a-react-native-app-part-iv-onboarding-screens-6ef48caefd6c 
 // https://medium.com/@gm_99/building-a-beautiful-onboarding-section-with-react-native-reanimated-39b7eec94892
+// https://github.com/mrousavy/react-native-mmkv#readme
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,7 @@ export default function App() {
   });
 
   if (!fontsLoaded && !fontError) {
+    console.log('loading');
     return null;
   };
 
@@ -41,8 +43,8 @@ export default function App() {
 
     setOnboarded(JSON.parse(isOnboarded));
     setLocale(JSON.parse(locale));
-    setTemp(JSON.parse(temp));
-    setWeight(JSON.parse(weight));
+    // setTemp(JSON.parse(temp));
+    // setWeight(JSON.parse(weight));
   };
 
   return (

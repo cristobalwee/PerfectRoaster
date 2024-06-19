@@ -21,6 +21,7 @@ export default function WeightSelectionPage({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const weightNames = { sm: 'Pequeño', md: 'Mediano', lg: 'Grande' };
   const cookNames = { med_rare: 'A punto', med: 'Término medio', med_well: 'Medio cocido', well: 'Bien cocido' };
+  const unitVals = { temp_celsius: 'ºC', temp_fahrenheit: 'ºF' };
 
   const cutData = cookData[cut];
   const weightVals = Object.keys(cutData);
@@ -30,7 +31,8 @@ export default function WeightSelectionPage({ route, navigation }) {
   const cookVals = Object.keys(cutCooks);
   const cookId = cookVals[selectedCook];
   const cook = cookData[cut][weight].cooks[cookId];
-  const showCooks = typeof cutCooks === 'object' && !Array.isArray(cutCooks) && cutCooks !== null;
+  const { temps } = cookData[cut][weight];
+  const showCooks = typeof cutCooks === 'object' && !Array.isArray(cutCooks) && cutCooks !== null && temps;
 
   const styles = StyleSheet.create({
     container: {
@@ -64,7 +66,7 @@ export default function WeightSelectionPage({ route, navigation }) {
           <>
             <Text style={ styles.subHeading }>Cocción</Text>
             <RadioGroup 
-              data={ cookVals.map(val => ({ title: cookNames[val], subtitle: 'Temperatura' })) }
+              data={ cookVals.map(val => ({ title: cookNames[val], subtitle: `${temps[val][tempUnits]} ${unitVals[tempUnits]}` })) }
               selected={ selectedCook }
               onSelect={ setSelectedCook }
             />

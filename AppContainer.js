@@ -11,8 +11,9 @@ import OnboardingLocales from './pages/onboardingLocale';
 import OnboardingIntro from './pages/onboardingIntro';
 import OnboardingRecs from './pages/onboardingRecs';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setLocale, setTempUnits, setWeightUnits } from './storageSlice';
+import { selectActiveCut } from './timerSlice';
 
 // https://www.reactnative.university/blog/live-activities-unleashed
 // https://medium.com/@rafiulansari/building-a-react-native-app-part-iv-onboarding-screens-6ef48caefd6c 
@@ -22,6 +23,8 @@ const Stack = createNativeStackNavigator();
 
 export default function AppContainer({ onboarded, locale, tempUnits, weightUnits }) {
   const dispatch = useDispatch();
+  const activeCut = useSelector(selectActiveCut);
+
   useEffect(() => {
     const formatLocale = locale ? 'en_US' : 'es_PE';
     const formatTemp = tempUnits ? 'temp_fahrenheit' : 'temp_celsius';
@@ -119,7 +122,10 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
         component={TimerPage} 
         options={({ navigation }) => ({
           title: 'Temporizador',
-          headerLeft: () => getBackButton(() => navigation.navigate('Home', { resetState: true })),
+          headerLeft: () => {
+            const backFn = activeCut ? () => navigation.navigate('Home', { resetState: true }) : () => navigation.goBack();
+            return getBackButton(backFn);
+          },
           headerShadowVisible: false,
           headerTitleStyle: {
             fontFamily: fontFamilies.subhead,

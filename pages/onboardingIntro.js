@@ -56,9 +56,8 @@ export default function OnboardingIntro({ navigation }) {
     <View style={styles.container}>
       <View style={ styles.videoContainer }>
       <Video 
-        source={ require('../assets/intro_video.mp4') }                             
-        onBuffer={ () => console.log('buffer') }          
-        onError={ () => console.log('error') }               
+        source={ require('../assets/intro_video.mp4') } 
+        onError={ () => console.log('error') }
         style={styles.video}
         repeat
       />
