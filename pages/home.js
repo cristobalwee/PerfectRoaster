@@ -1,12 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, ScrollView, View, Text, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import CardButton from '../components/cardButton';
 import Hero from '../components/hero';
 import { colors, fontFamilies, spacing, textSizes, borderRadius } from '../constants/styles';
 import Recipe from '../components/recipe';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import BottomSheet from '../components/bottomSheet';
 import getDay from '../utils/getDay';
 import Pivot from '../components/pivot';
@@ -17,11 +16,10 @@ import Toggle from '../components/toggle';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetTimer, selectActiveCookTime, selectActiveCut, selectNextTimer, selectStarted, startTimer, stopTimer } from '../timerSlice';
 import BottomBar from '../components/bottomBar';
-import getTranslation from '../utils/getTranslation';
 import { selectLocale, selectTempUnits, selectWeightUnits, setLocale, setTempUnits, setWeightUnits } from '../storageSlice';
-import { locales } from '../locales/locales';
-import { setLocaleEN } from '../utils/setLocaleEN';
-import { setTemp, setWeight } from '../utils/setUnits';
+import { storage } from '../utils/storage';
+import getTranslation from '../utils/getTranslation';
+import { onDisplayNotification } from '../utils/notifications';
 
 const meatIcons = {
   'pollo': require('../assets/images/icons/pollo.png'),
@@ -37,17 +35,23 @@ export default function HomeScreen({ route, navigation }) {
   const [sheet, setSheet] = useState(null);
   const onCardPress = (newSheet) => setSheet(newSheet);
   const onSheetClose = () => {
-    if (sheet === 'listo') dispatch(resetTimer());
+    if (sheet === 'listo') {
+      dispatch(stopTimer());
+      dispatch(resetTimer());
+    }
     setSheet(null);
   };
   const locale = useSelector(selectLocale);
   const tempUnits = useSelector(selectTempUnits);
   const weightUnits = useSelector(selectWeightUnits);
-  const currentDate = getDay(locale);
+  const weightUnitVals = { 'weight_gr' : 'g', 'weight_lbs': 'lbs' };
+  const weightMultiplier = weightUnits === 'weight_lbs' ? 0.0022 : 1;
+  const currentDate = useMemo(() => getDay(locale));
   const cardRows = [
     ['pollo', 'res', 'cerdo'],
     ['cordero', 'pato', 'cuy']
   ];
+  const useTranslate = (string) => getTranslation(string, locale);
 
   const dispatch = useDispatch();
   const startedAt = useSelector(selectStarted);
@@ -115,18 +119,14 @@ export default function HomeScreen({ route, navigation }) {
     }
   });
 
-  const clearAll = async () => {
-    try {
-      await AsyncStorage.clear()
-    } catch(e) {
-      console.log(e);
-    }
-
+  const clearAll = () => {
+    storage.clearAll();
     console.log('Done.');
   }
 
   useEffect(() => {
     if (activeCut) setSheet(null);
+    console.log(weightUnits);
   }, [activeCut]);
 
   const recipeArray = Object.keys(recipeList);
@@ -147,7 +147,7 @@ export default function HomeScreen({ route, navigation }) {
         return (
           <CardButton
             key={ meat }
-            text={ getTranslation(meat) }
+            text={ useTranslate(meat) }
             icon={ meatIcons[meat] }
             onPress={ () => onCardPress(meat) }
           />
@@ -157,35 +157,44 @@ export default function HomeScreen({ route, navigation }) {
   ));
 
   const cutPivots = cuts[sheet]
-    ? cuts[sheet].map(cut => (
-      <Pivot
-        { ...cut }
-        title={ locales[locale][cut.id] }
-        onPress={ () => cut.link(navigation) }
-        key={ cut.id }
-      />
-    ))
+    ? cuts[sheet].map(cut => {
+      let weight = `${Math.round(cut.weights * weightMultiplier * 10) / 10}`;
+      if (Array.isArray(cut.weights)) {
+        weight = `${Math.round(cut.weights[0] * weightMultiplier * 10) / 10}-${Math.round(cut.weights[1] * weightMultiplier * 10) / 10}`;
+      };
+
+      const subtitle = `${weight}${weightUnitVals[weightUnits]}`;
+      return (
+        <Pivot
+          { ...cut }
+          title={ useTranslate(cut.id) }
+          subtitle={ subtitle }
+          onPress={ () => cut.link(navigation) }
+          key={ cut.id }
+        />
+      )
+    })
     : null;
   
   const settingsPivots = [
     <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>{ getTranslation('weight') }</Text>
+      <Text style={ styles.unitPivotTitle }>{ useTranslate('weight') }</Text>
       <Toggle 
         onSelect={ (selected) => {
-          setWeight(selected ? 'weight_lbs' : 'weight_gr');
+          storage.set('weightUnits', selected);
           dispatch(setWeightUnits(selected));
         }}
         selected={ weightUnits === 'weight_lbs' ? 1 : 0 }
         data={ 
-          [{ text: getTranslation('weight_gr'), id: 'weight_gr' }, { text: getTranslation('weight_lbs'), id: 'weight_lbs' }] 
+          [{ text: useTranslate('weight_gr'), id: 'weight_gr' }, { text: useTranslate('weight_lbs'), id: 'weight_lbs' }] 
         }
       />
     </View>,
     <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>{ getTranslation('temp') }</Text>
+      <Text style={ styles.unitPivotTitle }>{ useTranslate('temp') }</Text>
       <Toggle 
         onSelect={ (selected) => {
-          setTemp(selected ? 'temp_fahrenheit' : 'temp_celsius');
+          storage.set('tempUnits', selected);
           dispatch(setTempUnits(selected));
         }}
         selected={ tempUnits === 'temp_fahrenheit' ? 1 : 0 }
@@ -195,10 +204,10 @@ export default function HomeScreen({ route, navigation }) {
       />
     </View>,
     <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>{ getTranslation('lang') }</Text>
+      <Text style={ styles.unitPivotTitle }>{ useTranslate('lang') }</Text>
       <Toggle 
         onSelect={ (selected) => {
-          setLocaleEN(selected ? 'true': 'false');
+          storage.set('locale', selected);
           dispatch(setLocale(selected));
         }}
         selected={ locale === 'en_US' ? 1 : 0 }
@@ -209,27 +218,56 @@ export default function HomeScreen({ route, navigation }) {
     </View>
   ];
 
+  // const doneContent = [
+  //   <View style={ styles.doneModal }>
+  //     <Text style={ styles.body }>{ useTranslate('timer_ready') } 8min</Text>
+  //     <View style={ styles.doneModalButtonContainer }>
+  //       <Button
+  //         as='primary'
+  //         text='Comenzar reposo'
+  //         onPress={ () => {
+            // dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, type: 'rest', nextTimer: 0, nextTimerType: null }));
+            // navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer });
+            // setSheet(null);
+  //         }}
+  //       />
+  //       <Button
+  //         as='secondary_alt'
+  //         text='Entendido'
+  //         onPress={ () => {
+  //           dispatch(stopTimer());
+  //           dispatch(resetTimer());
+  //           setSheet(null);
+  //         } }
+  //       />
+  //     </View>
+  //   </View>
+  // ];
+
   const doneContent = [
     <View style={ styles.doneModal }>
-      <Text style={ styles.body }>Tu comida esta lista! Te recomendamos reposar tu carne por 8min</Text>
+      <Text style={ styles.body }>{ nextTimer ? `${useTranslate('timer_ready')} ${nextTimer / 60}min` : useTranslate('timer_ready_done')}</Text>
       <View style={ styles.doneModalButtonContainer }>
-        <Button
-          as='primary'
-          text='Comenzar reposo'
-          onPress={ () => {
-            dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, type: 'rest', nextTimer: 0, nextTimerType: null }));
-            navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer });
-            setSheet(null);
-          }}
-        />
+        { nextTimer ? (
+          <Button
+            as='primary'
+            text={ useTranslate('start_rest') }
+            onPress={ () => {
+              dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, type: 'rest', nextTimer: 0, nextTimerType: null }));
+              navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer, shouldStart: true });
+              onDisplayNotification(nextTimer, 0, locale);
+              setSheet(null);
+            }}
+          />
+        ) : null }
         <Button
           as='secondary_alt'
-          text='Entendido'
+          text={ useTranslate('got_it') }
           onPress={ () => {
             dispatch(stopTimer());
             dispatch(resetTimer());
             setSheet(null);
-          } }
+          }}
         />
       </View>
     </View>
@@ -251,7 +289,7 @@ export default function HomeScreen({ route, navigation }) {
       <ScrollView style={styles.container}>
         <Hero
           background={ require('../assets/images/hero_home.jpg') }
-          title={ getTranslation('home_hero') }
+          title={ useTranslate('home_hero') }
           eyebrow={ currentDate }
           rightAction={ () => setSheet('ajustes') }
         />
@@ -259,8 +297,8 @@ export default function HomeScreen({ route, navigation }) {
           { renderCards }
         </View>
         <View style={ styles.subHeadingContainer }>
-          <Text style={ styles.subHeading }>{ getTranslation('recipes') }</Text>
-          <Button as='link' text='Ver más' onPress={ () => navigation.navigate('Recipes') } />
+          <Text style={ styles.subHeading }>{ useTranslate('recipes') }</Text>
+          <Button as='link' text={ useTranslate('view_more') } onPress={ () => navigation.navigate('Recipes') } />
         </View>
         <ScrollView horizontal>
           { renderRecipes }

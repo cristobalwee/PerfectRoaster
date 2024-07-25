@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, ScrollView, View, Image } from 'react-native';
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
@@ -7,7 +7,8 @@ import { cookData } from '../data/cookData';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RadioGroup from '../components/radioGroup';
 import { useSelector } from 'react-redux';
-import { selectTempUnits } from '../storageSlice';
+import { selectLocale, selectTempUnits } from '../storageSlice';
+import getTranslation from '../utils/getTranslation';
 
 export default function CookSelectionPage({ route, navigation }) {
   const { cut, weight } = route.params;
@@ -15,6 +16,8 @@ export default function CookSelectionPage({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const cookNames = { med_rare: 'A punto', med: 'Término medio', med_well: 'Medio cocido', well: 'Bien cocido' };
   const unitVals = { temp_celsius: 'ºC', temp_fahrenheit: 'ºF' };
+  const locale = useSelector(selectLocale);
+  const useTranslate = (string) => getTranslation(string, locale);
 
   const cookVals = Object.keys(cookData[cut][weight].cooks);
   const cookId = cookVals[selectedCook];
@@ -45,9 +48,9 @@ export default function CookSelectionPage({ route, navigation }) {
   return (
     <Fragment>
       <ScrollView style={styles.container}>
-        <Text style={ styles.subHeading }>Cocción</Text>
+        <Text style={ styles.subHeading }>{ useTranslate('cook') }</Text>
         <RadioGroup 
-          data={ cookVals.map(val => ({ title: cookNames[val], subtitle: `${temps[val][tempUnits]} ${unitVals[tempUnits]}` })) }
+          data={ cookVals.map(val => ({ title: useTranslate(val), subtitle: `${temps[val][tempUnits]} ${unitVals[tempUnits]}` })) }
           selected={ selectedCook }
           onSelect={ setSelectedCook }
         />
@@ -57,7 +60,7 @@ export default function CookSelectionPage({ route, navigation }) {
       <View style={styles.buttonContainer}>
         <Button
           as='primary'
-          text='Siguiente'
+          text={ useTranslate('next') }
           onPress={ () => navigation.navigate('Timer', { cut, weight, cook }) }
           arrow
         />

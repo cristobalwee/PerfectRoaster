@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image } from 'react-native';
 import { colors, spacing } from '../constants/styles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { setLocale } from '../storageSlice';
+import { setLocale, setTempUnits, setWeightUnits } from '../storageSlice';
 import { useDispatch } from 'react-redux';
+import { storage } from '../utils/storage';
 
 export default function OnboardingLocales({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -35,9 +35,15 @@ export default function OnboardingLocales({ navigation }) {
     }
   });
 
-  const setLocaleEN = async (locale) => {
-    await AsyncStorage.setItem('LOCALE', locale);
-  };
+  const setStorage = (locale, temp, weight) => {
+    storage.set('locale', locale);
+    storage.set('tempUnits', temp);
+    storage.set('weightUnits', weight);
+
+    dispatch(setLocale(locale));
+    dispatch(setTempUnits(temp));
+    dispatch(setWeightUnits(weight));
+  }
 
   return (
     <View style={styles.container}>
@@ -49,8 +55,7 @@ export default function OnboardingLocales({ navigation }) {
           as='primary_alt'
           text='Español'
           onPress={ () => {
-            setLocaleEN('false');
-            dispatch(setLocale('es_PE'));
+            setStorage('es_PE', 'temp_celsius', 'weight_gr');
             navigation.navigate('OnboardingIntro');
           }}
           icon={ <Image style={{ width: 24, height: 24 }} source={ require('../assets/images/icons/flag-spain.png') } /> }
@@ -59,8 +64,7 @@ export default function OnboardingLocales({ navigation }) {
           as='primary_alt'
           text='English'
           onPress={ () => {
-            setLocaleEN('true');
-            dispatch(setLocale('en_US'));
+            setStorage('en_US', 'temp_fahrenheit', 'weight_lbs');
             navigation.navigate('OnboardingIntro');
           }}
           icon={ <Image style={{ width: 24, height: 24 }} source={ require('../assets/images/icons/flag-uk.png') } /> }

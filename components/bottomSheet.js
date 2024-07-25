@@ -1,4 +1,4 @@
-import React, {Fragment, ReactNode, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {Pressable, StyleSheet, View, Text, Image} from 'react-native';
 import Animated, {
   FadeIn,
@@ -11,13 +11,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import getTranslation from '../utils/getTranslation';
+import { useSelector } from 'react-redux';
+import { selectLocale } from '../storageSlice';
 
 const PressAnimated = Animated.createAnimatedComponent(Pressable);
 
 export default function BottomSheet({ offsetBottom, title, children, isOpen, backdropOnPress, hasActions }) {
   const offset = useSharedValue(0);
   const [animOffset, setAnimOffset] = useState(0);
-  const translatedTitle = getTranslation(title);
+  const locale = useSelector(selectLocale);
+  const translatedTitle = getTranslation(title, locale);
   const styles = StyleSheet.create({
     backdrop: {
       ...StyleSheet.absoluteFillObject,

@@ -4,15 +4,17 @@ import { useIsFocused } from '@react-navigation/native'
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { startTimer, stopTimer, resetTimer, selectStarted, selectStopped, selectActiveCut, selectActiveCookTime, selectTimerType, selectNextTimer, selectNextType } from '../timerSlice';
-import notifee, { TriggerType } from '@notifee/react-native';
+import notifee from '@notifee/react-native';
 import Button from '../components/button';
 import { cookData } from '../data/cookData';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Svg, Circle } from 'react-native-svg'
 import { getElapsedTime } from '../utils/getElapsed';
 import BottomSheet from '../components/bottomSheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getTranslation from '../utils/getTranslation';
+import { selectLocale } from '../storageSlice';
+import { cancelNotif, onDisplayNotification } from '../utils/notifications';
 
 // https://dev.to/shivampawar/efficiently-managing-timers-in-a-react-native-app-overcoming-background-foreground-timer-state-issues-map
 // https://github.com/react-native-push-notification/ios
@@ -39,6 +41,8 @@ export default function TimerPage({ route, navigation }) {
   const timerType = useSelector(selectTimerType);
   const nextTimerType = useSelector(selectNextType);
   const nextTimer = useSelector(selectNextTimer);
+  const locale = useSelector(selectLocale);
+  const useTranslate = (string) => getTranslation(string, locale);
   const elapsed = getElapsedTime(startedAt, stoppedAt);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
@@ -148,40 +152,13 @@ export default function TimerPage({ route, navigation }) {
   const [localShouldStart, setShouldStart] = useState(shouldStart);
   const [done, setDone] = useState(false);
   const [displayTime, setDisplay] = useState(finalCookTime  - (trueElapsed * timeOffset)/1000);
-
-  const nextNotice = hasNextStep ? `Siguiente paso: ${step2}min a fuego alto` : `Al terminar, repose por ${rest/60}min`;
-
-  async function onDisplayNotification() {
-    await notifee.requestPermission({ criticalAlert: true });
-    const trigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: Date.now() + (finalCookTime * 1000) + 250
-    };
-
-    const channelId = await notifee.createChannel({
-      id: 'default',
-      name: 'Default Channel',
-    });
-
-    await notifee.createTriggerNotification({
-      title: 'Listo!',
-      body: 'Tu comida está lista',
-      android: {
-        channelId,
-        pressAction: {
-          id: 'default',
-        },
-      },
-      ios: {
-        interruptionLevel: 'timeSensitive',
-        critical: true,
-        sound: 'default'
-      }
-    }, trigger);
-  };
+  const nextNotice = hasNextStep ? useTranslate('next_step')(step2/60) : useTranslate('next_rest')(rest);
+  const circleTime = time <= 0 ? 0.99 : (finalCookTime - displayTime)/100;
 
   useEffect(() => {
-    console.log(timerType, nextTimerType);
+    // console.log(timerType, nextTimerType);
+    if (time < 0) setTime(0);
+
     if (time < 0.25 && !done) {
       setDone(true);
       setTimeout(() => {
@@ -218,12 +195,12 @@ export default function TimerPage({ route, navigation }) {
 
   const doneContent = [
     <View style={ styles.doneModal }>
-      <Text style={ styles.body }>Tu comida esta lista! { nextTimer ? `Te recomendamos reposar tu carne por ${rest / 60}min` : 'Disfruta y no te olvides de limpiar tu Roaster.'}</Text>
+      <Text style={ styles.body }>{ nextTimer ? `${useTranslate('timer_ready')} ${rest / 60}min` : useTranslate('timer_ready_done')}</Text>
       <View style={ styles.doneModalButtonContainer }>
         { nextTimer ? (
           <Button
             as='primary'
-            text='Comenzar reposo'
+            text={ useTranslate('start_rest') }
             onPress={ () => {
               setDone(false);
               setTime(rest);
@@ -231,13 +208,14 @@ export default function TimerPage({ route, navigation }) {
               navigation.navigate('Timer', { cut: activeCut, cookTime: rest });
               dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0, type: 'rest', nextTimerType: null }));
               setShouldStart(true);
+              onDisplayNotification(rest, 0, locale);
               setSheet(null);
             }}
           />
         ) : null }
         <Button
           as='secondary_alt'
-          text='Entendido'
+          text={ useTranslate('got_it') }
           onPress={ () => {
             resetTime();
             setSheet(null);
@@ -251,11 +229,11 @@ export default function TimerPage({ route, navigation }) {
 
   const nextContent = [
     <View style={ styles.doneModal }>
-      <Text style={ styles.body }>Paso 1 completo, retira y limpia receptor de jugos y continua con el siguiente paso a fuego alto.</Text>
+      <Text style={ styles.body }>{ useTranslate('step_done')}</Text>
       <View style={ styles.doneModalButtonContainer }>
         <Button
           as='primary'
-          text='Comenzar siguiente paso'
+          text={ useTranslate('start_next') }
           onPress={ () => {
             setDone(false);
             setTime(rest);
@@ -263,12 +241,13 @@ export default function TimerPage({ route, navigation }) {
             navigation.navigate('Timer', { cut: activeCut, cookTime: step2 });
             dispatch(startTimer({ cut, finalCookTime: step2, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
             setShouldStart(true);
+            onDisplayNotification(step2, 0, locale);
             setSheet(null);
           }}
         />
         <Button
           as='secondary_alt'
-          text='Cancelar'
+          text={ useTranslate('cancelar') }
           onPress={ () => {
             resetTime();
             setSheet(null);
@@ -280,11 +259,11 @@ export default function TimerPage({ route, navigation }) {
 
   const cancelContent = [
     <View style={ styles.doneModal }>
-      <Text style={ styles.body }>Estás seguro? Todavía te quedan { formatTime(time) } para terminar tu { getTranslation(cut) }</Text>
+      <Text style={ styles.body }>{ useTranslate('confirm_cancel_current')(formatTime(time), useTranslate(cut)) }</Text>
       <View style={ styles.doneModalButtonContainer }>
         <Button
           as='primary'
-          text='Si, cancelar'
+          text={ useTranslate('confirm_cancel') }
           onPress={ () => {
             setDone(false);
             setTime(finalCookTime);
@@ -296,7 +275,7 @@ export default function TimerPage({ route, navigation }) {
         />
         <Button
           as='secondary_alt'
-          text='No, regresar'
+          text={ useTranslate('confirm_back') }
           onPress={ () => setSheet(null) }
         />
       </View>
@@ -305,23 +284,24 @@ export default function TimerPage({ route, navigation }) {
 
   const resetContent = [
     <View style={ styles.doneModal }>
-      <Text style={ styles.body }>Estás seguro? Tu {activeCut} va estar listo en {formatTime(activeCookTime - elapsed/1000)}</Text>
+      <Text style={ styles.body }>{useTranslate('confirm_reset_current')(formatTime(activeCookTime - elapsed/1000), useTranslate(activeCut))}</Text>
       <View style={ styles.doneModalButtonContainer }>
         <Button
           as='primary'
-          text='Si, cancelar'
+          text={ useTranslate('confirm_cancel')}
           onPress={ () => {
             setDone(false);
             setTime(finalCookTime);
             setDisplay(finalCookTime);
             setShouldStart(true);
             dispatch(startTimer({ cut, finalCookTime, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
+            onDisplayNotification(finalCookTime, 0, locale);
             setSheet(null);
           }}
         />
         <Button
           as='secondary_alt'
-          text='No, regresar'
+          text={ useTranslate('confirm_back') }
           onPress={ () => setSheet(null) }
         />
       </View>
@@ -336,7 +316,7 @@ export default function TimerPage({ route, navigation }) {
         return doneContent;
       case 'siguiente_paso':
         return nextContent;
-      case 'cancelar presente':
+      case 'cancelar_presente':
         return resetContent;
       default:
         return null;
@@ -348,7 +328,7 @@ export default function TimerPage({ route, navigation }) {
       <ScrollView style={styles.container}>
         <View style={ styles.svgContainer }>
           <View style={ styles.timeContainer }>
-            <Text style={ styles.subtitle }>Tiempo de cocción</Text>
+            <Text style={ styles.subtitle }>{ useTranslate('cook_time') }</Text>
             <Text style={ styles.time }>{ formatTime(time) }</Text>
           </View>
           <Svg width={size} height={size}>
@@ -367,7 +347,7 @@ export default function TimerPage({ route, navigation }) {
               cy={size / 2}
               r={radius}
               strokeDasharray={`${circum} ${circum}`}
-              strokeDashoffset={radius * Math.PI * 2 * ((finalCookTime - displayTime)/100)}
+              strokeDashoffset={radius * Math.PI * 2 * circleTime}
               strokeLinecap="round"
               transform={`rotate(-90, ${size/2}, ${size/2})`}
               {...{strokeWidth}}
@@ -377,7 +357,7 @@ export default function TimerPage({ route, navigation }) {
         <View style={ styles.buttonContainer }>
           <Button
             as='secondary'
-            text='Cancelar'
+            text={ useTranslate('cancelar') }
             onPress={ () => {
               if (elapsed > 0 && cut === activeCut) {
                 setSheet('cancelar')
@@ -389,18 +369,19 @@ export default function TimerPage({ route, navigation }) {
           />
           <Button
             as='primary'
-            text={ isStarted ? 'Pausar' : 'Comenzar' }
+            text={ isStarted ? useTranslate('pause') : useTranslate('begin') }
             onPress={ () => {
               if (elapsed > 0 && cut !== activeCut) {
-                return setSheet('cancelar presente');
+                return setSheet('cancelar_presente');
               };
               
               if (isStarted) {
-                dispatch(stopTimer());
+                dispatch(stopTimer()); 
+                notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
               } else {
                 setShouldStart(true);
                 dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest' }));
-                // onDisplayNotification();
+                onDisplayNotification(finalCookTime, trueElapsed, locale);
               }
             } }
             icon={ 

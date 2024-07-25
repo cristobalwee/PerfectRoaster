@@ -10,10 +10,12 @@ import TimerPage from './pages/timer';
 import OnboardingLocales from './pages/onboardingLocale';
 import OnboardingIntro from './pages/onboardingIntro';
 import OnboardingRecs from './pages/onboardingRecs';
-import { useEffect } from 'react';
+import notifee, { EventType } from '@notifee/react-native';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLocale, setTempUnits, setWeightUnits } from './storageSlice';
+import { setLocale, setTempUnits, setWeightUnits, selectLocale } from './storageSlice';
 import { selectActiveCut } from './timerSlice';
+import getTranslation from './utils/getTranslation';
 
 // https://www.reactnative.university/blog/live-activities-unleashed
 // https://medium.com/@rafiulansari/building-a-react-native-app-part-iv-onboarding-screens-6ef48caefd6c 
@@ -21,19 +23,16 @@ import { selectActiveCut } from './timerSlice';
 
 const Stack = createNativeStackNavigator();
 
-export default function AppContainer({ onboarded, locale, tempUnits, weightUnits }) {
+export default function AppContainer({ onboarded, locale, tempUnits, weightUnits, navigation }) {
   const dispatch = useDispatch();
   const activeCut = useSelector(selectActiveCut);
+  const currLocale = useSelector(selectLocale);
 
   useEffect(() => {
-    const formatLocale = locale ? 'en_US' : 'es_PE';
-    const formatTemp = tempUnits ? 'temp_fahrenheit' : 'temp_celsius';
-    const formatWeight = weightUnits ? 'weight_lbs' : 'weight_gr';
-
-    dispatch(setLocale(formatLocale));
-    dispatch(setTempUnits(formatTemp));
-    dispatch(setWeightUnits(formatWeight));
-  });
+    dispatch(setLocale(locale));
+    dispatch(setTempUnits(tempUnits));
+    dispatch(setWeightUnits(weightUnits));
+  }, [onboarded, locale, tempUnits, weightUnits]);
 
   const getBackButton = (back) => (
     <Pressable onPress={ back }>
@@ -75,7 +74,7 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
         name='Recipes' 
         component={RecipesScreen} 
         options={({ navigation }) => ({
-          title: 'Recetas',
+          title: getTranslation('recipes', currLocale),
           headerLeft: () => getBackButton(() => navigation.goBack()),
           headerShadowVisible: false,
           headerTitleStyle: {
@@ -95,7 +94,7 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
         name='WeightSelection' 
         component={WeightSelectionPage} 
         options={({ navigation }) => ({
-          title: 'Configuración',
+          title: getTranslation('config', currLocale),
           headerLeft: () => getBackButton(() => navigation.goBack()),
           headerShadowVisible: false,
           headerTitleStyle: {
@@ -108,7 +107,7 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
         name='CookSelection' 
         component={CookSelectionPage} 
         options={({ navigation }) => ({
-          title: 'Cocción',
+          title: getTranslation('config', currLocale),
           headerLeft: () => getBackButton(() => navigation.goBack()),
           headerShadowVisible: false,
           headerTitleStyle: {
@@ -121,7 +120,7 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
         name='Timer' 
         component={TimerPage} 
         options={({ navigation }) => ({
-          title: 'Temporizador',
+          title: getTranslation('timer', currLocale),
           headerLeft: () => {
             const backFn = activeCut ? () => navigation.navigate('Home', { resetState: true }) : () => navigation.goBack();
             return getBackButton(backFn);

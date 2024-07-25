@@ -6,6 +6,9 @@ import { useIsFocused } from '@react-navigation/native';
 import { getElapsedTime } from '../utils/getElapsed';
 import { useDispatch, useSelector } from 'react-redux';
 import getTranslation from '../utils/getTranslation';
+import notifee from '@notifee/react-native';
+import { cancelNotif, onDisplayNotification } from '../utils/notifications';
+import { selectLocale } from '../storageSlice';
 
 export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   const styles = StyleSheet.create({
@@ -57,6 +60,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   const nextTimer = useSelector(selectNextTimer);
   const nextTimerType = useSelector(selectNextType);
   const timerType = useSelector(selectTimerType);
+  const locale = useSelector(selectLocale);
 
   const [time, setTime] = useState(activeCookTime - elapsed/1000);
   const [firstLoad, setFirstLoad] = useState(true);
@@ -65,8 +69,11 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   const isStopped = !!stoppedAt;
   const sliceIdx = time / 60 > 60 ? 11 : 14;
   const formattedTime = new Date(time * 1000).toISOString().substring(sliceIdx, 19);
+  const subtitle = timerType === 'rest' ?  'resting' : activeCut;
 
   useEffect(() => {
+    if (time < 0) setTime(0);
+
     if (time < 0.25 && !done) {
       setDone(true);
       onDone();
@@ -74,7 +81,12 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
 
     const interval = setInterval(() => {
       if (time > 0.25 && !isStopped && isFocused) {
-        setTime(activeCookTime - elapsed / 1000);
+        const newTime = activeCookTime - elapsed / 1000;
+        if (newTime < 0) {
+          setTime(0);
+        } else {
+          setTime(newTime);
+        }
       }
     }, 250);
 
@@ -84,6 +96,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   useEffect(() => {
     if (isFocused && firstLoad) {
       setTime(activeCookTime - elapsed/1000);
+      setDone(false);
       setFirstLoad(false);
     }
 
@@ -94,7 +107,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   return (
     <View style={ styles.container }>
       <View style={ styles.timeContainer }>
-        <Text style={styles.subtitle}>{ getTranslation(activeCut) } – { timerType || 'cook' }</Text>
+        <Text style={styles.subtitle}>{ getTranslation(subtitle, locale) }</Text>
         <Text style={ styles.time }>{ formattedTime } </Text>
       </View>
       <View style={ styles.actions }>
@@ -103,8 +116,10 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
           onPress={ () => {
             if (isStopped) {
               dispatch(startTimer({ cut: activeCut, finalCookTime: activeCookTime, type: timerType, nextTimer, nextTimerType }))
+              onDisplayNotification(activeCookTime, elapsed, locale);
             } else {
               dispatch(stopTimer())
+              notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
             }
           }}
         >

@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getTranslation from '../utils/getTranslation';
 import { useDispatch } from 'react-redux';
 import { setOnboarded } from '../storageSlice';
+import { storage } from '../utils/storage';
 
 export default function OnboardingRecs({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -53,10 +54,6 @@ export default function OnboardingRecs({ navigation }) {
       gap: spacing.md
     }
   });
-  
-  const onPressFinish = async () => {
-    await AsyncStorage.setItem('ONBOARDED', 'true');
-  };
 
   return (
     <View style={styles.container}>
@@ -82,9 +79,8 @@ export default function OnboardingRecs({ navigation }) {
           as='primary_alt'
           text={ getTranslation('begin') }
           onPress={ () => {
-            onPressFinish();
+            storage.set('onboarded', true);
             navigation.navigate('Home');
-            dispatch(setOnboarded());
           }}
           arrow
         />
