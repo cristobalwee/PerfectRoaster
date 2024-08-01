@@ -85,6 +85,21 @@ export default function TimerPage({ route, navigation }) {
       fontSize: textSizes.navHeader,
       fontFamily: fontFamilies.paragraph
     },
+    steps: {
+      backgroundColor: colors.beige,
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 8,
+      marginTop: 8,
+      marginBottom: -12
+    },
+    stepsText: {
+      fontSize: textSizes.body,
+      fontFamily: fontFamilies.paragraph,
+    },
     buttonContainer: {
       flexDirection: 'row',
       paddingHorizontal: spacing.xs,
@@ -125,7 +140,9 @@ export default function TimerPage({ route, navigation }) {
 
   const { cut, weight, cook, cookTime, shouldStart } = route.params;
   const isStarted = startedAt && !stoppedAt && activeCut === cut;
-  const hasNextStep = (cut === 'cerdo_costillas' || cut === 'cerdo_panceta') && nextTimerType !== 'rest';
+  const cutHasSteps = cut === 'cerdo_costillas' || cut === 'cerdo_panceta';
+  const hasNextStep = timerType ? timerType === 'cook' && nextTimerType !== 'rest' : cutHasSteps;
+  const stepCounter = nextTimerType === 'rest' ? 'step_2' : 'step_1';
   let finalCookTime, rest, step2;
   
   if (cookTime) {
@@ -156,8 +173,8 @@ export default function TimerPage({ route, navigation }) {
   const circleTime = time <= 0 ? 0.99 : (finalCookTime - displayTime)/100;
 
   useEffect(() => {
-    // console.log(timerType, nextTimerType);
     if (time < 0) setTime(0);
+    console.log(hasNextStep, nextTimerType, timerType);
 
     if (time < 0.25 && !done) {
       setDone(true);
@@ -271,6 +288,8 @@ export default function TimerPage({ route, navigation }) {
             dispatch(stopTimer());
             dispatch(resetTimer());
             setSheet(null);
+            navigation.navigate('Home', { resetState: true });
+            notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
           }}
         />
         <Button
@@ -297,6 +316,7 @@ export default function TimerPage({ route, navigation }) {
             dispatch(startTimer({ cut, finalCookTime, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
             onDisplayNotification(finalCookTime, 0, locale);
             setSheet(null);
+            notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
           }}
         />
         <Button
@@ -330,6 +350,8 @@ export default function TimerPage({ route, navigation }) {
           <View style={ styles.timeContainer }>
             <Text style={ styles.subtitle }>{ useTranslate('cook_time') }</Text>
             <Text style={ styles.time }>{ formatTime(time) }</Text>
+            { (hasNextStep || (cutHasSteps && timerType === 'cook'))
+              && <View style={ styles.steps }><Text style={ styles.stepsText }>{ useTranslate(stepCounter) }</Text></View> }
           </View>
           <Svg width={size} height={size}>
             <Circle 
@@ -360,7 +382,7 @@ export default function TimerPage({ route, navigation }) {
             text={ useTranslate('cancelar') }
             onPress={ () => {
               if (elapsed > 0 && cut === activeCut) {
-                setSheet('cancelar')
+                setSheet('cancelar');
               } else {
                 navigation.navigate('Home', { resetState: true });
               }
@@ -380,7 +402,7 @@ export default function TimerPage({ route, navigation }) {
                 notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
               } else {
                 setShouldStart(true);
-                dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest' }));
+                dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: timerType || 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest', multiStepRest: hasNextStep ? rest : 0 }));
                 onDisplayNotification(finalCookTime, trueElapsed, locale);
               }
             } }

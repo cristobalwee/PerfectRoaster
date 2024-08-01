@@ -7,7 +7,8 @@ const initialState = {
   activeCookTime: 0,
   nextTimer: 0,
   nextTimerType: null,
-  type: null
+  type: null,
+  multiStepRest: 0
 };
 
 export const timerSlice = createSlice({
@@ -16,7 +17,7 @@ export const timerSlice = createSlice({
   reducers: {
     startTimer: (state, action) => {
       const now = new Date().getTime();
-      const { payload: { cut, finalCookTime, nextTimer, type, nextTimerType } } = action;
+      const { payload: { cut, finalCookTime, nextTimer, type, nextTimerType, multiStepRest = 0 } } = action;
       const { startedAt, stoppedAt } = state;
       
       state.startedAt = stoppedAt ? now - (stoppedAt - startedAt): now;
@@ -26,6 +27,7 @@ export const timerSlice = createSlice({
       state.nextTimer = nextTimer;
       state.nextTimerType = nextTimerType;
       state.type = type;
+      state.multiStepRest = multiStepRest;
     },
     stopTimer: (state) => {
       const now = new Date().getTime();
@@ -41,6 +43,7 @@ export const timerSlice = createSlice({
       state.nextTimer = 0;
       state.nextTimerType = null;
       state.type = null;
+      state.multiStepRest = 0;
     }
   },
   selectors: {
@@ -51,7 +54,8 @@ export const timerSlice = createSlice({
     selectLocalTime: (sliceState) => sliceState.localTime,
     selectNextTimer: (sliceState) => sliceState.nextTimer,
     selectNextType: (sliceState) => sliceState.nextTimerType,
-    selectTimerType: (sliceState) => sliceState.type
+    selectTimerType: (sliceState) => sliceState.type,
+    selectMultiStepRest: (sliceState) => sliceState.multiStepRest
   }
 });
 
@@ -64,7 +68,8 @@ export const {
   selectLocalTime,
   selectNextTimer,
   selectNextType,
-  selectTimerType
+  selectTimerType,
+  selectMultiStepRest
 } = timerSlice.selectors;
 
 export default timerSlice.reducer;

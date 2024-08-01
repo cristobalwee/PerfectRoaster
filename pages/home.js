@@ -10,11 +10,11 @@ import BottomSheet from '../components/bottomSheet';
 import getDay from '../utils/getDay';
 import Pivot from '../components/pivot';
 import { cuts } from '../data/cuts';
-import { recipeList } from '../data/recipes';
+import recipeList from '../data/recipes';
 import Button from '../components/button';
 import Toggle from '../components/toggle';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetTimer, selectActiveCookTime, selectActiveCut, selectNextTimer, selectStarted, startTimer, stopTimer } from '../timerSlice';
+import { resetTimer, selectActiveCookTime, selectActiveCut, selectMultiStepRest, selectNextTimer, selectNextType, selectStarted, selectTimerType, startTimer, stopTimer } from '../timerSlice';
 import BottomBar from '../components/bottomBar';
 import { selectLocale, selectTempUnits, selectWeightUnits, setLocale, setTempUnits, setWeightUnits } from '../storageSlice';
 import { storage } from '../utils/storage';
@@ -58,7 +58,12 @@ export default function HomeScreen({ route, navigation }) {
   const activeCut = useSelector(selectActiveCut);
   const activeCookTime = useSelector(selectActiveCookTime);
   const isStarted = startedAt && activeCut;
+  const timerType = useSelector(selectTimerType);
   const nextTimer = useSelector(selectNextTimer);
+  const nextTimerType = useSelector(selectNextType);
+  const multiStepRest = useSelector(selectMultiStepRest);
+  const cutHasSteps = activeCut === 'cerdo_costillas' || activeCut === 'cerdo_panceta';
+  const hasNextStep = timerType ? timerType === 'cook' && nextTimerType !== 'rest' : cutHasSteps;
 
   const styles = StyleSheet.create({
     container: {
@@ -126,23 +131,24 @@ export default function HomeScreen({ route, navigation }) {
 
   useEffect(() => {
     if (activeCut) setSheet(null);
-    console.log(weightUnits);
+
+    console.log(activeCut, multiStepRest);
   }, [activeCut]);
 
-  const recipeArray = Object.keys(recipeList);
+  const recipeArray = Object.keys(recipeList[locale]);
   const renderRecipes = recipeArray.map((recipe, i) => (
     <Recipe
-      title={ recipeList[recipe].title }
-      img={ recipeList[recipe].img }
-      onPress={ () => navigation.navigate('Recipe', { recipe: recipeList[recipe] }) }
+      title={ recipeList[locale][recipe]?.title }
+      img={ recipeList[locale][recipe]?.img }
+      onPress={ () => navigation.navigate('Recipe', { recipe: recipeList[locale][recipe] }) }
       offset={ i === 0 }
-      key={ recipeList[recipe].id }
-      duration={ `${recipeList[recipe].time}min` }
+      key={ recipeList[locale][recipe]?.id }
+      duration={ `${recipeList[locale][recipe]?.time}min` }
     />
   ));
 
-  const renderCards = cardRows.map(row => (
-    <View style={ styles.row }>
+  const renderCards = cardRows.map((row, i) => (
+    <View style={ styles.row } key={ i }>
       { row.map(meat => {
         return (
           <CardButton
@@ -218,32 +224,6 @@ export default function HomeScreen({ route, navigation }) {
     </View>
   ];
 
-  // const doneContent = [
-  //   <View style={ styles.doneModal }>
-  //     <Text style={ styles.body }>{ useTranslate('timer_ready') } 8min</Text>
-  //     <View style={ styles.doneModalButtonContainer }>
-  //       <Button
-  //         as='primary'
-  //         text='Comenzar reposo'
-  //         onPress={ () => {
-            // dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, type: 'rest', nextTimer: 0, nextTimerType: null }));
-            // navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer });
-            // setSheet(null);
-  //         }}
-  //       />
-  //       <Button
-  //         as='secondary_alt'
-  //         text='Entendido'
-  //         onPress={ () => {
-  //           dispatch(stopTimer());
-  //           dispatch(resetTimer());
-  //           setSheet(null);
-  //         } }
-  //       />
-  //     </View>
-  //   </View>
-  // ];
-
   const doneContent = [
     <View style={ styles.doneModal }>
       <Text style={ styles.body }>{ nextTimer ? `${useTranslate('timer_ready')} ${nextTimer / 60}min` : useTranslate('timer_ready_done')}</Text>
@@ -273,12 +253,41 @@ export default function HomeScreen({ route, navigation }) {
     </View>
   ];
 
+  const nextContent = [
+    <View style={ styles.doneModal }>
+      <Text style={ styles.body }>{ useTranslate('step_done')}</Text>
+      <View style={ styles.doneModalButtonContainer }>
+        <Button
+          as='primary'
+          text={ useTranslate('start_next') }
+          onPress={ () => {
+            dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, nextTimer: multiStepRest, type: 'cook', nextTimerType: 'rest' }));
+            navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer, shouldStart: true });
+            onDisplayNotification(multiStepRest, 0, locale);
+            setSheet(null);
+          }}
+        />
+        <Button
+          as='secondary_alt'
+          text={ useTranslate('cancelar') }
+          onPress={ () => {
+            dispatch(stopTimer());
+            dispatch(resetTimer());
+            setSheet(null);
+          }}
+        />
+      </View>
+    </View>
+  ];
+
   const getSheetContent = () => {
     switch (sheet) {
       case 'ajustes':
         return settingsPivots;
       case 'listo':
         return doneContent;
+      case 'siguiente_paso':
+        return nextContent;
       default:
         return cutPivots;
     };
@@ -303,7 +312,7 @@ export default function HomeScreen({ route, navigation }) {
         <ScrollView horizontal>
           { renderRecipes }
         </ScrollView>
-        <Button as='link' text='Clear' onPress={ clearAll } />
+        {/* <Button as='link' text='Clear' onPress={ clearAll } /> */}
         <View style={{ height: 36 + insets.bottom }}></View>
         <StatusBar style='light' />
       </ScrollView>
@@ -320,7 +329,11 @@ export default function HomeScreen({ route, navigation }) {
         <BottomBar
           offsetBottom={ insets.bottom }
           onLink={ () => navigation.navigate('Timer', { cut: activeCut, cookTime: activeCookTime, shouldStart: true }) }
-          onDone={ () => setSheet('listo') }
+          onDone={ () => {
+            if (hasNextStep) return setSheet('siguiente_paso');
+
+            setSheet('listo')
+          } }
           onBlur={ setFirstLoad => {
             navigation.addListener('blur', () => {
               setFirstLoad(true);
