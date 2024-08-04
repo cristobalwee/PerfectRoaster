@@ -115,9 +115,6 @@ export default function HomeScreen({ route, navigation }) {
       fontFamily: fontFamilies.subhead,
       fontSize: textSizes.body
     },
-    doneModal: {
-
-    },
     doneModalButtonContainer: {
       gap: spacing.sm,
       marginTop: spacing.lg
@@ -131,8 +128,6 @@ export default function HomeScreen({ route, navigation }) {
 
   useEffect(() => {
     if (activeCut) setSheet(null);
-
-    console.log(activeCut, multiStepRest);
   }, [activeCut]);
 
   const recipeArray = Object.keys(recipeList[locale]);
@@ -263,7 +258,7 @@ export default function HomeScreen({ route, navigation }) {
           onPress={ () => {
             dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, nextTimer: multiStepRest, type: 'cook', nextTimerType: 'rest' }));
             navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer, shouldStart: true });
-            onDisplayNotification(multiStepRest, 0, locale);
+            onDisplayNotification(nextTimer, 0, locale);
             setSheet(null);
           }}
         />
@@ -321,7 +316,7 @@ export default function HomeScreen({ route, navigation }) {
         isOpen={ sheet }
         offsetBottom={ insets.bottom }
         title={ sheet }
-        hasActions={ sheet === 'listo' }
+        hasActions={ sheet === 'listo' || sheet === 'siguiente_paso' }
       >
         { getSheetContent() }
       </BottomSheet>
@@ -332,7 +327,7 @@ export default function HomeScreen({ route, navigation }) {
           onDone={ () => {
             if (hasNextStep) return setSheet('siguiente_paso');
 
-            setSheet('listo')
+            setSheet('listo');
           } }
           onBlur={ setFirstLoad => {
             navigation.addListener('blur', () => {

@@ -223,8 +223,8 @@ export const cookData = {
     'lg': { 
       weight: 600,
       cooks: {
-        'step1': [2400, 2700], 
-        'step2': [2700, 3000]
+        'step1': [12, 2700], 
+        'step2': [10, 3000]
       },
       rest: 360
     },
