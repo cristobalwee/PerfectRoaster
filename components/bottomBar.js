@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, Pressable, Alert } from 'react-native';
 import { circleRadius, colors, fontFamilies, spacing, textSizes } from '../constants/styles';
-import { startTimer, selectActiveCookTime, selectActiveCut, selectStarted, selectStopped, stopTimer, selectTimerType, selectNextTimer, selectNextType } from '../timerSlice';
+import { startTimer, selectActiveCookTime, selectActiveCut, selectStarted, selectStopped, stopTimer, selectTimerType, selectNextTimer, selectNextType, selectMultiStepRest } from '../timerSlice';
 import { useState, useEffect } from 'react';
 import { useIsFocused } from '@react-navigation/native';
 import { getElapsedTime } from '../utils/getElapsed';
@@ -60,6 +60,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   const nextTimer = useSelector(selectNextTimer);
   const nextTimerType = useSelector(selectNextType);
   const timerType = useSelector(selectTimerType);
+  const multiStepRest = useSelector(selectMultiStepRest);
   const locale = useSelector(selectLocale);
 
   const [time, setTime] = useState(activeCookTime - elapsed/1000);
@@ -70,6 +71,15 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   const sliceIdx = time / 60 > 60 ? 11 : 14;
   const formattedTime = new Date(time * 1000).toISOString().substring(sliceIdx, 19);
   const subtitle = timerType === 'rest' ?  'resting' : activeCut;
+  const isMultiStep = !!(multiStepRest);
+  const stepInfo = nextTimerType === 'cook' ? 'step_1' : 'step_2';
+  let cutInfo;
+
+  if (isMultiStep) {
+    cutInfo = stepInfo
+  } else {
+    cutInfo = timerType === 'rest' ? activeCut : null;
+  }
 
   useEffect(() => {
     if (time < 0) setTime(0);
@@ -107,7 +117,7 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
   return (
     <View style={ styles.container }>
       <View style={ styles.timeContainer }>
-        <Text style={styles.subtitle}>{ getTranslation(subtitle, locale) }</Text>
+        <Text style={styles.subtitle}>{ getTranslation(subtitle, locale) } { cutInfo && `– ${getTranslation(cutInfo, locale)}` }</Text>
         <Text style={ styles.time }>{ formattedTime } </Text>
       </View>
       <View style={ styles.actions }>

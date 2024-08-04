@@ -3,7 +3,7 @@ import { StyleSheet, Text, ScrollView, View, Dimensions, Image, Alert } from 're
 import { useIsFocused } from '@react-navigation/native'
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { startTimer, stopTimer, resetTimer, selectStarted, selectStopped, selectActiveCut, selectActiveCookTime, selectTimerType, selectNextTimer, selectNextType } from '../timerSlice';
+import { startTimer, stopTimer, resetTimer, selectStarted, selectStopped, selectActiveCut, selectActiveCookTime, selectTimerType, selectNextTimer, selectNextType, selectActiveWeight } from '../timerSlice';
 import notifee from '@notifee/react-native';
 import Button from '../components/button';
 import { cookData } from '../data/cookData';
@@ -37,6 +37,7 @@ export default function TimerPage({ route, navigation }) {
   const startedAt = useSelector(selectStarted);
   const stoppedAt = useSelector(selectStopped);
   const activeCut = useSelector(selectActiveCut);
+  const activeWeight = useSelector(selectActiveWeight);
   const activeCookTime = useSelector(selectActiveCookTime);
   const timerType = useSelector(selectTimerType);
   const nextTimerType = useSelector(selectNextType);
@@ -78,7 +79,7 @@ export default function TimerPage({ route, navigation }) {
       alignItems: 'center'
     },
     time: {
-      fontSize: 54,
+      fontSize: 60,
       fontFamily: fontFamilies.subhead
     },
     subtitle: {
@@ -151,6 +152,10 @@ export default function TimerPage({ route, navigation }) {
     finalCookTime = cook ? getValues(cook) : getValues(cookData[cut][weight].cooks);
   }
 
+  if (hasNextStep && typeof finalCookTime === 'number') {
+    finalCookTime = getValues(cookData[activeCut][activeWeight].cooks);
+  }
+
   if (typeof finalCookTime === 'object') {
     step2 = finalCookTime.step2[0];
     finalCookTime = finalCookTime.step1[0];
@@ -161,6 +166,8 @@ export default function TimerPage({ route, navigation }) {
   } else {
     if (nextTimer && nextTimerType === 'rest') rest = nextTimer;
   }
+
+  console.log(finalCookTime, trueElapsed);
 
   const timeOffset = 100/finalCookTime;
   const trueElapsed = activeCut === cut ? elapsed : 0;
@@ -174,7 +181,6 @@ export default function TimerPage({ route, navigation }) {
 
   useEffect(() => {
     if (time < 0) setTime(0);
-    console.log(hasNextStep, nextTimerType, timerType);
 
     if (time < 0.25 && !done) {
       setDone(true);
@@ -252,11 +258,11 @@ export default function TimerPage({ route, navigation }) {
           as='primary'
           text={ useTranslate('start_next') }
           onPress={ () => {
+            console.log(step2);
             setDone(false);
             setTime(rest);
             setDisplay(rest);
-            navigation.navigate('Timer', { cut: activeCut, cookTime: step2 });
-            dispatch(startTimer({ cut, finalCookTime: step2, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
+            dispatch(startTimer({ cut, finalCookTime: step2, nextTimer: rest, type: 'cook', nextTimerType: 'rest', activeWeight: weight || activeWeight }));
             setShouldStart(true);
             onDisplayNotification(step2, 0, locale);
             setSheet(null);
@@ -343,12 +349,15 @@ export default function TimerPage({ route, navigation }) {
     };
   }
 
+  const timeTitle = timerType === 'rest' ? 'rest_time' : 'cook_time';
+  console.log(`time: ${time}, display: ${displayTime}`);
+
   return (
     <>
       <ScrollView style={styles.container}>
         <View style={ styles.svgContainer }>
           <View style={ styles.timeContainer }>
-            <Text style={ styles.subtitle }>{ useTranslate('cook_time') }</Text>
+            <Text style={ styles.subtitle }>{ useTranslate(timeTitle) }</Text>
             <Text style={ styles.time }>{ formatTime(time) }</Text>
             { (hasNextStep || (cutHasSteps && timerType === 'cook'))
               && <View style={ styles.steps }><Text style={ styles.stepsText }>{ useTranslate(stepCounter) }</Text></View> }
@@ -402,7 +411,7 @@ export default function TimerPage({ route, navigation }) {
                 notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
               } else {
                 setShouldStart(true);
-                dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: timerType || 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest', multiStepRest: hasNextStep ? rest : 0 }));
+                dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: timerType || 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest', multiStepRest: hasNextStep ? rest : 0, activeWeight: (hasNextStep && weight || activeWeight) }));
                 onDisplayNotification(finalCookTime, trueElapsed, locale);
               }
             } }

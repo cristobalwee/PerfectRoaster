@@ -80,7 +80,7 @@ export default function WeightSelectionPage({ route, navigation }) {
         <Button
           as='primary'
           text={ useTranslate('next') }
-          onPress={ () => navigation.navigate('Timer', { cut, weight, cook }) }
+          onPress={ () => navigation.navigate('Timer', { cut, weight, cook: cut === 'cerdo_panceta' ? null: cook }) }
           arrow
         />
       </View>
