@@ -256,7 +256,7 @@ export default function HomeScreen({ route, navigation }) {
           as='primary'
           text={ useTranslate('start_next') }
           onPress={ () => {
-            dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, nextTimer: multiStepRest, type: 'cook', nextTimerType: 'rest' }));
+            dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, nextTimer: multiStepRest, type: 'cook', nextTimerType: 'rest',  multiStepRest }));
             navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer, shouldStart: true });
             onDisplayNotification(nextTimer, 0, locale);
             setSheet(null);

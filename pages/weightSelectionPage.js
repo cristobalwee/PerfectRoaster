@@ -34,6 +34,7 @@ export default function WeightSelectionPage({ route, navigation }) {
   const cook = cookData[cut][weight].cooks[cookId];
   const { temps } = cookData[cut][weight];
   const showCooks = typeof cutCooks === 'object' && !Array.isArray(cutCooks) && cutCooks !== null && temps;
+  const multiStep = cut === 'cerdo_panceta';
 
   const styles = StyleSheet.create({
     container: {
@@ -80,7 +81,13 @@ export default function WeightSelectionPage({ route, navigation }) {
         <Button
           as='primary'
           text={ useTranslate('next') }
-          onPress={ () => navigation.navigate('Timer', { cut, weight, cook: cut === 'cerdo_panceta' ? null: cook }) }
+          onPress={ () => {
+            if (multiStep) {
+              navigation.navigate('MultiStep', { cut, weight, cook: null })
+            } else {
+              navigation.navigate('Timer', { cut, weight, cook })
+            }
+          } }
           arrow
         />
       </View>

@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getTranslation from '../utils/getTranslation';
 import { selectLocale } from '../storageSlice';
 import { cancelNotif, onDisplayNotification } from '../utils/notifications';
+import formatTime from '../utils/formatTime';
 
 // https://dev.to/shivampawar/efficiently-managing-timers-in-a-react-native-app-overcoming-background-foreground-timer-state-issues-map
 // https://github.com/react-native-push-notification/ios
@@ -27,10 +28,6 @@ const getValues = (val) => {
   return Array.isArray(val) ? val[0] : val;
 };
 
-const formatTime = time => {
-  const sliceIdx = time / 60 > 60 ? 11 : 14;
-  return new Date(time * 1000).toISOString().substring(sliceIdx, 19);
-};
 
 export default function TimerPage({ route, navigation }) {
   const dispatch = useDispatch();
@@ -143,7 +140,7 @@ export default function TimerPage({ route, navigation }) {
   const isStarted = startedAt && !stoppedAt && activeCut === cut;
   const cutHasSteps = cut === 'cerdo_costillas' || cut === 'cerdo_panceta';
   const hasNextStep = timerType ? timerType === 'cook' && nextTimerType !== 'rest' : cutHasSteps;
-  const stepCounter = nextTimerType === 'rest' ? 'step_2' : 'step_1';
+  const stepCounter = (nextTimerType === 'rest' && activeCut === cut) ? 'step_2' : 'step_1';
   let finalCookTime, rest, step2;
   
   if (cookTime) {
@@ -166,8 +163,6 @@ export default function TimerPage({ route, navigation }) {
   } else {
     if (nextTimer && nextTimerType === 'rest') rest = nextTimer;
   }
-
-  console.log(finalCookTime, trueElapsed);
 
   const timeOffset = 100/finalCookTime;
   const trueElapsed = activeCut === cut ? elapsed : 0;
@@ -229,7 +224,7 @@ export default function TimerPage({ route, navigation }) {
               setTime(rest);
               setDisplay(rest);
               navigation.navigate('Timer', { cut: activeCut, cookTime: rest });
-              dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0, type: 'rest', nextTimerType: null }));
+              dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0, type: 'rest', nextTimerType: null, activeWeight: weight || activeWeight }));
               setShouldStart(true);
               onDisplayNotification(rest, 0, locale);
               setSheet(null);
@@ -258,13 +253,13 @@ export default function TimerPage({ route, navigation }) {
           as='primary'
           text={ useTranslate('start_next') }
           onPress={ () => {
-            console.log(step2);
             setDone(false);
-            setTime(rest);
-            setDisplay(rest);
-            dispatch(startTimer({ cut, finalCookTime: step2, nextTimer: rest, type: 'cook', nextTimerType: 'rest', activeWeight: weight || activeWeight }));
+            setTime(step2);
+            setDisplay(step2);
             setShouldStart(true);
             onDisplayNotification(step2, 0, locale);
+            navigation.navigate('Timer', { cut: activeCut, cookTime: step2 });
+            dispatch(startTimer({ cut, finalCookTime: step2, nextTimer: cookData[activeCut][activeWeight].rest, type: 'cook', nextTimerType: 'rest', activeWeight: weight || activeWeight, multiStepRest: rest }));
             setSheet(null);
           }}
         />
@@ -350,7 +345,6 @@ export default function TimerPage({ route, navigation }) {
   }
 
   const timeTitle = timerType === 'rest' ? 'rest_time' : 'cook_time';
-  console.log(`time: ${time}, display: ${displayTime}`);
 
   return (
     <>
@@ -410,7 +404,10 @@ export default function TimerPage({ route, navigation }) {
                 dispatch(stopTimer()); 
                 notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
               } else {
+                setDone(false);
                 setShouldStart(true);
+                setTime(finalCookTime);
+                setDisplay(finalCookTime);
                 dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: timerType || 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest', multiStepRest: hasNextStep ? rest : 0, activeWeight: (hasNextStep && weight || activeWeight) }));
                 onDisplayNotification(finalCookTime, trueElapsed, locale);
               }

@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setLocale, setTempUnits, setWeightUnits, selectLocale } from './storageSlice';
 import { selectActiveCut } from './timerSlice';
 import getTranslation from './utils/getTranslation';
+import MultiStepNoticePage from './pages/multiStepNotice';
 
 // https://www.reactnative.university/blog/live-activities-unleashed
 // https://medium.com/@rafiulansari/building-a-react-native-app-part-iv-onboarding-screens-6ef48caefd6c 
@@ -67,7 +68,8 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
         name='Home' 
         component={HomeScreen}
         options={{
-          headerShown: false
+          headerShown: false,
+          gestureEnabled: false
         }}
       />
       <Stack.Screen 
@@ -108,6 +110,19 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
         component={CookSelectionPage} 
         options={({ navigation }) => ({
           title: getTranslation('config', currLocale),
+          headerLeft: () => getBackButton(() => navigation.goBack()),
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontFamily: fontFamilies.subhead,
+            fontSize: textSizes.navHeader
+          }
+        })}
+      />
+      <Stack.Screen 
+        name='MultiStep' 
+        component={MultiStepNoticePage} 
+        options={({ navigation }) => ({
+          title: getTranslation('instructions', currLocale),
           headerLeft: () => getBackButton(() => navigation.goBack()),
           headerShadowVisible: false,
           headerTitleStyle: {

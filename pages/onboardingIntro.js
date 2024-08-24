@@ -5,11 +5,15 @@ import Button from '../components/button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Video from 'react-native-video';
 import getTranslation from '../utils/getTranslation';
+import { useSelector } from 'react-redux';
+import { selectLocale } from '../storageSlice';
 
 // https://www.codedaily.io/tutorials/Create-a-Looping-Background-Video-with-React-Native-Video
 
 export default function OnboardingIntro({ navigation }) {
   const insets = useSafeAreaInsets();
+  const locale = useSelector(selectLocale);
+  const useTranslate = (string) => getTranslation(string, locale);
 
   const styles = StyleSheet.create({
     container: {
@@ -63,15 +67,15 @@ export default function OnboardingIntro({ navigation }) {
       />
       </View>
       <View style={ styles.contentContainer }>
-        <Text style={ styles.eyebrow }>{ getTranslation('welcome') }</Text>
+        <Text style={ styles.eyebrow }>{ useTranslate('welcome') }</Text>
         <Text style={ styles.headline }>
-          { getTranslation('onboarding_intro') }
+          { useTranslate('onboarding_intro') }
         </Text>
       </View>
       <View style={ styles.buttonContainer }>
         <Button
           as='primary_alt'
-          text={ getTranslation('next') }
+          text={ useTranslate('next') }
           onPress={ () => {
             navigation.navigate('OnboardingRecs');
           }}

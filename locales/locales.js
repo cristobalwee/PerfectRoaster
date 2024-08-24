@@ -51,6 +51,7 @@ export const locales = {
     'resting': 'Reposando',
     'step_1': 'Paso 1 de 2',
     'step_2': 'Paso 2 de 2',
+    'instructions': 'Instrucciones',
 
     'next_step': (step2) => `Siguiente paso: ${step2}min a fuego alto`,
     'next_rest': (rest) => `Al terminar, repose por ${rest/60}min`,
@@ -134,6 +135,7 @@ export const locales = {
     'resting': 'Resting',
     'step_1': 'Step 1 of 2',
     'step_2': 'Step 2 of 2',
+    'instructions': 'Instructions',
 
     'next_step': (step2) => `Next step: ${step2}min on high heat`,
     'next_rest': (rest) => `After finishing, rest for ${rest/60}min`,

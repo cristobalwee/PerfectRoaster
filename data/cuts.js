@@ -86,7 +86,7 @@ export const cuts = {
       id: 'cerdo_costillas',
       weights: 1000,
       media: <Image style={ styles.pivotImage } source={ require('../assets/images/cerdo_costillas.png') } />,
-      link: (navigation) => navigation.navigate('Timer', { cut: 'cerdo_costillas', weight: 'sm' })
+      link: (navigation) => navigation.navigate('MultiStep', { cut: 'cerdo_costillas', weight: 'sm' })
     },
     { 
       id: 'cerdo_picana',

@@ -5,13 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getTranslation from '../utils/getTranslation';
-import { useDispatch } from 'react-redux';
-import { setOnboarded } from '../storageSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectLocale, setOnboarded } from '../storageSlice';
 import { storage } from '../utils/storage';
 
 export default function OnboardingRecs({ navigation }) {
   const insets = useSafeAreaInsets();
-  const dispatch = useDispatch();
+  const locale = useSelector(selectLocale);
+  const useTranslate = (string) => getTranslation(string, locale);
 
   const styles = StyleSheet.create({
     container: {
@@ -60,24 +61,24 @@ export default function OnboardingRecs({ navigation }) {
       <Image style={{ height: 55, width: 46 }} source={ require('../assets/images/logo_flame.png') } />
       <View style={{ gap: spacing.sm }}>
         <Text style={ styles.eyebrow }>Perfect Roaster</Text>
-        <Text style={ styles.headline }>{ getTranslation('recs') }</Text>
+        <Text style={ styles.headline }>{ useTranslate('recs') }</Text>
       </View>
       <View style={ styles.item }>
         <Image style={{ height: 40, width: 40 }} source={ require('../assets/images/hornilla-gas.png') } />
-        <Text style={ styles.itemText }>{ getTranslation('recs_burner') }</Text>
+        <Text style={ styles.itemText }>{ useTranslate('recs_burner') }</Text>
       </View>
       <View style={ styles.item }>
         <Image style={{ height: 40, width: 40 }} source={ require('../assets/images/temperatura.png') } />
-        <Text style={ styles.itemText }>{ getTranslation('recs_temp') }</Text>
+        <Text style={ styles.itemText }>{ useTranslate('recs_temp') }</Text>
       </View>
       <View style={ styles.item }>
         <Image style={{ height: 40, width: 40 }} source={ require('../assets/images/no-congelar.png') } />
-        <Text style={ styles.itemText }>{ getTranslation('recs_frozen') }</Text>
+        <Text style={ styles.itemText }>{ useTranslate('recs_frozen') }</Text>
       </View>
       <View style={ styles.buttonContainer }>
         <Button
           as='primary_alt'
-          text={ getTranslation('begin') }
+          text={ useTranslate('begin') }
           onPress={ () => {
             storage.set('onboarded', true);
             navigation.navigate('Home');
