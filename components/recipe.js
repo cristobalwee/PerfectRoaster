@@ -26,7 +26,8 @@ export default function Recipe({ img, title, subtitle, size = 'sm', offset, onPr
       width: '100%',
       height: subtitle ? 170 : 160,
       borderRadius: borderRadius,
-      marginBottom: spacing.xs
+      marginBottom: spacing.xs,
+      resizeMode: 'cover'
     }
   });
   

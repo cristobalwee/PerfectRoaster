@@ -1,38 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ScrollView, View, Text, Image } from 'react-native';
+import { StyleSheet, ScrollView, View, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import CardButton from '../components/cardButton';
 import Hero from '../components/hero';
 import { colors, fontFamilies, spacing, textSizes, borderRadius } from '../constants/styles';
-import Recipe from '../components/recipe';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import BottomSheet from '../components/bottomSheet';
 import getDay from '../utils/getDay';
-import Pivot from '../components/pivot';
 import { cuts } from '../data/cuts';
 import recipeList from '../data/recipes';
 import Button from '../components/button';
-import Toggle from '../components/toggle';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetTimer, selectActiveCookTime, selectActiveCut, selectMultiStepRest, selectNextTimer, selectNextType, selectStarted, selectTimerType, startTimer, stopTimer } from '../timerSlice';
 import BottomBar from '../components/bottomBar';
-import { selectLocale, selectTempUnits, selectWeightUnits, setLocale, setTempUnits, setWeightUnits } from '../storageSlice';
+import { selectLocale } from '../storageSlice';
 import { storage } from '../utils/storage';
 import getTranslation from '../utils/getTranslation';
 import { onDisplayNotification } from '../utils/notifications';
-
-const meatIcons = {
-  'pollo': require('../assets/images/icons/pollo.png'),
-  'res': require('../assets/images/icons/res.png'),
-  'cordero': require('../assets/images/icons/cordero.png'),
-  'pato': require('../assets/images/icons/pato.png'),
-  'cerdo': require('../assets/images/icons/cerdo.png'),
-  'cuy': require('../assets/images/icons/cuy.png')
-}
+import CardSection from '../components/cardSection';
+import RecipeScrollView from '../components/recipeScrollView';
+import SettingsList from '../components/settingsList';
+import CutList from '../components/cutList';
+import DoneModal from '../components/doneModal';
 
 export default function HomeScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const [sheet, setSheet] = useState(null);
+  const [animOffset, setAnimOffset] = useState(1);
   const onCardPress = (newSheet) => setSheet(newSheet);
   const onSheetClose = () => {
     if (sheet === 'listo') {
@@ -42,15 +35,7 @@ export default function HomeScreen({ route, navigation }) {
     setSheet(null);
   };
   const locale = useSelector(selectLocale);
-  const tempUnits = useSelector(selectTempUnits);
-  const weightUnits = useSelector(selectWeightUnits);
-  const weightUnitVals = { 'weight_gr' : 'g', 'weight_lbs': 'lbs' };
-  const weightMultiplier = weightUnits === 'weight_lbs' ? 0.0022 : 1;
   const currentDate = useMemo(() => getDay(locale));
-  const cardRows = [
-    ['pollo', 'res', 'cerdo'],
-    ['cordero', 'pato', 'cuy']
-  ];
   const useTranslate = (string) => getTranslation(string, locale);
 
   const dispatch = useDispatch();
@@ -77,12 +62,6 @@ export default function HomeScreen({ route, navigation }) {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg
     },
-    row: {
-      flex: 1,
-      flexDirection: 'row',
-      gap: spacing.xs,
-      marginBottom: spacing.xs
-    },
     subHeadingContainer: {
       paddingHorizontal: spacing.lg,
       marginTop: spacing.lg,
@@ -97,10 +76,6 @@ export default function HomeScreen({ route, navigation }) {
       fontFamily: fontFamilies.subhead,
       fontSize: textSizes.navHeader
     },
-    body: {
-      fontFamily: fontFamilies.paragraph,
-      fontSize: textSizes.body
-    },
     pivotImage: {
       width: 80,
       height: 80,
@@ -114,10 +89,6 @@ export default function HomeScreen({ route, navigation }) {
     unitPivotTitle: {
       fontFamily: fontFamilies.subhead,
       fontSize: textSizes.body
-    },
-    doneModalButtonContainer: {
-      gap: spacing.sm,
-      marginTop: spacing.lg
     }
   });
 
@@ -127,164 +98,93 @@ export default function HomeScreen({ route, navigation }) {
   }
 
   useEffect(() => {
+    if (cuts[sheet]) {
+      setAnimOffset(cuts[sheet].length);
+    } else if (sheet === 'ajustes') {
+      setAnimOffset(2.5);
+    }
+  }, [sheet]);
+
+  useEffect(() => {
     if (activeCut) setSheet(null);
   }, [activeCut]);
 
-  const recipeArray = Object.keys(recipeList[locale]);
-  const renderRecipes = recipeArray.map((recipe, i) => (
-    <Recipe
-      title={ recipeList[locale][recipe]?.title }
-      img={ recipeList[locale][recipe]?.img }
-      onPress={ () => navigation.navigate('Recipe', { recipe: recipeList[locale][recipe] }) }
-      offset={ i === 0 }
-      key={ recipeList[locale][recipe]?.id }
-      duration={ `${recipeList[locale][recipe]?.time}min` }
-    />
-  ));
+  const onNextPress = (nextTimerToSet, type, nextTypeToSet, multi) => {
+    dispatch(startTimer({ 
+      cut: activeCut,
+      finalCookTime: nextTimer,
+      nextTimer: nextTimerToSet,
+      type,
+      nextTimerType: nextTypeToSet,
+      multiStepRest: multi && multiStepRest 
+    }));
+    navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer, shouldStart: true });
+    onDisplayNotification(nextTimer, 0, locale);
+    setSheet(null);
+  }
 
-  const renderCards = cardRows.map((row, i) => (
-    <View style={ styles.row } key={ i }>
-      { row.map(meat => {
-        return (
-          <CardButton
-            key={ meat }
-            text={ useTranslate(meat) }
-            icon={ meatIcons[meat] }
-            onPress={ () => onCardPress(meat) }
-          />
-        );
-      })}
-    </View>
-  ));
+  const onCancelPress = () => {
+    dispatch(stopTimer());
+    dispatch(resetTimer());
+    setSheet(null);
+  }
 
-  const cutPivots = cuts[sheet]
-    ? cuts[sheet].map(cut => {
-      let weight = `${Math.round(cut.weights * weightMultiplier * 10) / 10}`;
-      if (Array.isArray(cut.weights)) {
-        weight = `${Math.round(cut.weights[0] * weightMultiplier * 10) / 10}-${Math.round(cut.weights[1] * weightMultiplier * 10) / 10}`;
-      };
-
-      const subtitle = `${weight}${weightUnitVals[weightUnits]}`;
-      return (
-        <Pivot
-          { ...cut }
-          title={ useTranslate(cut.id) }
-          subtitle={ subtitle }
-          onPress={ () => cut.link(navigation) }
-          key={ cut.id }
-        />
-      )
-    })
-    : null;
-  
-  const settingsPivots = [
-    <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>{ useTranslate('weight') }</Text>
-      <Toggle 
-        onSelect={ (selected) => {
-          storage.set('weightUnits', selected);
-          dispatch(setWeightUnits(selected));
-        }}
-        selected={ weightUnits === 'weight_lbs' ? 1 : 0 }
-        data={ 
-          [{ text: useTranslate('weight_gr'), id: 'weight_gr' }, { text: useTranslate('weight_lbs'), id: 'weight_lbs' }] 
-        }
-      />
-    </View>,
-    <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>{ useTranslate('temp') }</Text>
-      <Toggle 
-        onSelect={ (selected) => {
-          storage.set('tempUnits', selected);
-          dispatch(setTempUnits(selected));
-        }}
-        selected={ tempUnits === 'temp_fahrenheit' ? 1 : 0 }
-        data={ 
-          [{ text: 'ºC', id: 'temp_celsius' }, { text: 'ºF', id: 'temp_fahrenheit' }] 
-        }
-      />
-    </View>,
-    <View style={ styles.unitPivot }>
-      <Text style={ styles.unitPivotTitle }>{ useTranslate('lang') }</Text>
-      <Toggle 
-        onSelect={ (selected) => {
-          storage.set('locale', selected);
-          dispatch(setLocale(selected));
-        }}
-        selected={ locale === 'en_US' ? 1 : 0 }
-        data={ 
-          [{ text: 'Español', id: 'es_PE' }, { text: 'English', id: 'en_US' }] 
-        }
-      />
-    </View>
-  ];
-
-  const doneContent = [
-    <View style={ styles.doneModal }>
-      <Text style={ styles.body }>{ nextTimer ? `${useTranslate('timer_ready')} ${nextTimer / 60}min` : useTranslate('timer_ready_done')}</Text>
-      <View style={ styles.doneModalButtonContainer }>
-        { nextTimer ? (
-          <Button
-            as='primary'
-            text={ useTranslate('start_rest') }
-            onPress={ () => {
-              dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, type: 'rest', nextTimer: 0, nextTimerType: null }));
-              navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer, shouldStart: true });
-              onDisplayNotification(nextTimer, 0, locale);
-              setSheet(null);
-            }}
-          />
-        ) : null }
-        <Button
-          as='secondary_alt'
-          text={ useTranslate('got_it') }
-          onPress={ () => {
-            dispatch(stopTimer());
-            dispatch(resetTimer());
-            setSheet(null);
-          }}
-        />
-      </View>
-    </View>
-  ];
-
-  const nextContent = [
-    <View style={ styles.doneModal }>
-      <Text style={ styles.body }>{ useTranslate('step_done')}</Text>
-      <View style={ styles.doneModalButtonContainer }>
+  const doneContent = (
+    <DoneModal
+      body={ nextTimer ? `${useTranslate('timer_ready')} ${nextTimer / 60}min` : useTranslate('timer_ready_done') }
+    >
+      { nextTimer ? (
         <Button
           as='primary'
-          text={ useTranslate('start_next') }
+          text={ useTranslate('start_rest') }
           onPress={ () => {
-            dispatch(startTimer({ cut: activeCut, finalCookTime: nextTimer, nextTimer: multiStepRest, type: 'cook', nextTimerType: 'rest',  multiStepRest }));
-            navigation.navigate('Timer', { cut: activeCut, cookTime: nextTimer, shouldStart: true });
-            onDisplayNotification(nextTimer, 0, locale);
-            setSheet(null);
+            onNextPress(0, 'rest', null, false);
           }}
         />
-        <Button
-          as='secondary_alt'
-          text={ useTranslate('cancelar') }
-          onPress={ () => {
-            dispatch(stopTimer());
-            dispatch(resetTimer());
-            setSheet(null);
-          }}
-        />
-      </View>
-    </View>
-  ];
+      ) : null }
+      <Button
+        as='secondary_alt'
+        text={ useTranslate('got_it') }
+        onPress={ () => {
+          onCancelPress();
+        }}
+      />
+    </DoneModal>
+  );
+
+  const nextContent = (
+    <DoneModal
+      body={ useTranslate('step_done') }
+    >
+      <Button
+        as='primary'
+        text={ useTranslate('start_next') }
+        onPress={ () => {
+          onNextPress(multiStepRest, 'cook', 'rest', true);
+        }}
+      />
+      <Button
+        as='secondary_alt'
+        text={ useTranslate('cancelar') }
+        onPress={ () => {
+          dispatch(stopTimer());
+          dispatch(resetTimer());
+          setSheet(null);
+        }}
+      />
+    </DoneModal>
+  );
 
   const getSheetContent = () => {
     switch (sheet) {
       case 'ajustes':
-        return settingsPivots;
+        return <SettingsList />;
       case 'listo':
         return doneContent;
       case 'siguiente_paso':
         return nextContent;
       default:
-        return cutPivots;
+        return <CutList sheet={ sheet } onPress={ (link) => link(navigation) } />
     };
   }
 
@@ -298,15 +198,13 @@ export default function HomeScreen({ route, navigation }) {
           rightAction={ () => setSheet('ajustes') }
         />
         <View style={ styles.section }>
-          { renderCards }
+          <CardSection onPress={ onCardPress } />
         </View>
         <View style={ styles.subHeadingContainer }>
           <Text style={ styles.subHeading }>{ useTranslate('recipes') }</Text>
           <Button as='link' text={ useTranslate('view_more') } onPress={ () => navigation.navigate('Recipes') } />
         </View>
-        <ScrollView horizontal>
-          { renderRecipes }
-        </ScrollView>
+        <RecipeScrollView onPress={ (locale, recipe) => navigation.navigate('Recipe', { recipe: recipeList[locale][recipe] }) } />
         {/* <Button as='link' text='Clear' onPress={ clearAll } /> */}
         <View style={{ height: 36 + insets.bottom }}></View>
         <StatusBar style='light' />
@@ -317,6 +215,7 @@ export default function HomeScreen({ route, navigation }) {
         offsetBottom={ insets.bottom }
         title={ sheet }
         hasActions={ sheet === 'listo' || sheet === 'siguiente_paso' }
+        animOffset={ animOffset }
       >
         { getSheetContent() }
       </BottomSheet>

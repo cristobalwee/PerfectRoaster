@@ -14,13 +14,9 @@ import formatTime from '../utils/formatTime';
 export default function MultiStepNoticePage({ route, navigation }) {
   const { cut, weight } = route.params;
   const insets = useSafeAreaInsets();
-  const unitVals = { temp_celsius: 'ºC', temp_fahrenheit: 'ºF' };
   const locale = useSelector(selectLocale);
   const useTranslate = (string) => getTranslation(string, locale);
-
   const cooks = cookData[cut][weight].cooks;
-  const { temps } = cookData[cut][weight];
-  const tempUnits = useSelector(selectTempUnits);
   
   const styles = StyleSheet.create({
     container: {
@@ -39,17 +35,29 @@ export default function MultiStepNoticePage({ route, navigation }) {
       fontSize: textSizes.navHeader,
       marginBottom: spacing.xs
     },
+    pageTitle: {
+      fontFamily: fontFamilies.subhead,
+      fontSize: 18,
+      marginBottom: spacing.sm
+    },
     body: {
       fontFamily: fontFamilies.paragraph,
       fontSize: textSizes.body
     },
     step: {
       justifyContent: 'center',
-      alignItems: 'center',
-      padding: spacing.md,
+      alignItems: 'flex-start',
       backgroundColor: colors.white,
       borderRadius: 16,
+      flexDirection: 'column',
+      marginBottom: spacing.md,
+      overflow: 'hidden'
+    },
+    innerStep: {
+      justifyContent: 'center',
+      alignItems: 'center',
       flexDirection: 'row',
+      padding: spacing.md,
       gap: spacing.md
     },
     stepImg: {
@@ -73,52 +81,54 @@ export default function MultiStepNoticePage({ route, navigation }) {
       fontFamily: fontFamilies.subhead,
       fontSize: textSizes.navHeader,
     },
-    midStep: {
-      paddingVertical: spacing.xl,
-      paddingHorizontal: spacing.md,
-      zIndex: -1,
-      marginVertical: -10,
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: 12
-    },
     stepIcons: {
       flexDirection: 'row',
       gap: 4,
       marginTop: 4
+    },
+    midStep: {
+      fontSize: 14,
+      fontFamily: fontFamilies.paragraph,
+      padding: spacing.md,
+      color: colors.link,
+      backgroundColor: colors.border,
+      alignSelf: 'stretch',
+      paddingVertical: spacing.sm,
     }
   });
 
   return (
     <Fragment>
       <ScrollView style={styles.container}>
-        <Text style={ styles.subHeading }>Esta carne se cocina en dos pasos</Text>
+        <Text style={ styles.pageTitle }>{ useTranslate('multi_step') }</Text>
         <View style={ styles.step }>
-          <View style={ styles.stepImg }>
-            <Text style={ styles.stepTime }>{ formatTime(cooks.step1[0]) }</Text>
-            <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
-          </View>
-          <View style={ styles.stepDetail }>
-            <Text style={ styles.stepTitle }>1. Fuego bajo</Text>
-            <Text style={ styles.body }>Cocine tu carne a fuego bajo por { cooks.step1[0] / 60 }min</Text>
-          </View>
-        </View>
-        <View style={ styles.midStep }>
-          <Text style={ styles.body }>Al terminar paso 1, retire su carne y limpie el receptaculo de jugos</Text>
-        </View>
-        <View style={ styles.step }>
-          <View style={ styles.stepImg }>
-            <Text style={ styles.stepTime }>{ formatTime(cooks.step2[0]) }</Text>
-            <View style={ styles.stepIcons }>
-              <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
-              <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
+          <View style={ styles.innerStep }>
+            <View style={ styles.stepImg }>
+              <Text style={ styles.stepTime }>{ formatTime(cooks.step1[0]) }</Text>
               <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
             </View>
+            <View style={ styles.stepDetail }>
+              <Text style={ styles.stepTitle }>{ useTranslate('multi_step_1_title') }</Text>
+              <Text style={ styles.body }>{ useTranslate('multi_step_1_description')(cooks.step1[0]) }</Text>
+            </View>
           </View>
-          <View style={ styles.stepDetail }>
-            <Text style={ styles.stepTitle }>2. Fuego alto</Text>
-            <Text style={ styles.body }>Cocine tu carne a fuego alto por { cooks.step2[0] / 60 }min</Text>
+          <Text style={ styles.midStep }>{ useTranslate('mid_step') }</Text>
+        </View>
+        
+        <View style={ styles.step }>
+          <View style={ styles.innerStep }>
+            <View style={ styles.stepImg }>
+              <Text style={ styles.stepTime }>{ formatTime(cooks.step2[0]) }</Text>
+              <View style={ styles.stepIcons }>
+                <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
+                <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
+                <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
+              </View>
+            </View>
+            <View style={ styles.stepDetail }>
+              <Text style={ styles.stepTitle }>{ useTranslate('multi_step_2_title') }</Text>
+              <Text style={ styles.body }>{ useTranslate('multi_step_2_description')(cooks.step2[0]) }</Text>
+            </View>
           </View>
         </View>
         <View style={{ marginBottom: 150 + insets.bottom }}></View>

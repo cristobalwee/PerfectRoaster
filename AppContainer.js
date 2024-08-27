@@ -10,8 +10,8 @@ import TimerPage from './pages/timer';
 import OnboardingLocales from './pages/onboardingLocale';
 import OnboardingIntro from './pages/onboardingIntro';
 import OnboardingRecs from './pages/onboardingRecs';
-import notifee, { EventType } from '@notifee/react-native';
-import { useEffect, useMemo } from 'react';
+import { useFonts } from 'expo-font';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLocale, setTempUnits, setWeightUnits, selectLocale } from './storageSlice';
 import { selectActiveCut } from './timerSlice';
@@ -28,6 +28,17 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
   const dispatch = useDispatch();
   const activeCut = useSelector(selectActiveCut);
   const currLocale = useSelector(selectLocale);
+
+  const [fontsLoaded, fontError] = useFonts({
+    Intro: require('./assets/fonts/Intro.otf'),
+    Poppins_Regular: require('./assets/fonts/Poppins-Regular.otf'),
+    Poppins_SemiBold: require('./assets/fonts/Poppins-SemiBold.otf')
+  });
+
+  if (!fontsLoaded && !fontError) {
+    console.log('loading');
+    return <Text>Loading</Text>;
+  };
 
   useEffect(() => {
     dispatch(setLocale(locale));

@@ -1,13 +1,25 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, ScrollView, View, Dimensions, Image, Alert } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, Dimensions, Image } from 'react-native';
 import { useIsFocused } from '@react-navigation/native'
 import { colors, fontFamilies, spacing, textSizes } from '../constants/styles';
 import { useSelector, useDispatch } from 'react-redux';
-import { startTimer, stopTimer, resetTimer, selectStarted, selectStopped, selectActiveCut, selectActiveCookTime, selectTimerType, selectNextTimer, selectNextType, selectActiveWeight } from '../timerSlice';
+import { 
+  startTimer,
+  stopTimer,
+  resetTimer,
+  selectStarted,
+  selectStopped,
+  selectActiveCut,
+  selectActiveCookTime,
+  selectTimerType,
+  selectNextTimer,
+  selectNextType,
+  selectActiveWeight
+} from '../timerSlice';
 import notifee from '@notifee/react-native';
 import Button from '../components/button';
 import { cookData } from '../data/cookData';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Svg, Circle } from 'react-native-svg'
 import { getElapsedTime } from '../utils/getElapsed';
 import BottomSheet from '../components/bottomSheet';
@@ -16,6 +28,9 @@ import getTranslation from '../utils/getTranslation';
 import { selectLocale } from '../storageSlice';
 import { cancelNotif, onDisplayNotification } from '../utils/notifications';
 import formatTime from '../utils/formatTime';
+import FloatingBar from '../components/floatingBar';
+import DoneModal from '../components/doneModal';
+import getValues from '../utils/getValues';
 
 // https://dev.to/shivampawar/efficiently-managing-timers-in-a-react-native-app-overcoming-background-foreground-timer-state-issues-map
 // https://github.com/react-native-push-notification/ios
@@ -24,10 +39,6 @@ import formatTime from '../utils/formatTime';
 // https://dev.to/medaimane/background-processing-in-react-native-exploring-techniques-for-efficient-task-handling-2cbf#:~:text=React%20Native%20Background%20Fetch,in%20the%20background%20or%20terminated.
 
 const windowDimensions = Dimensions.get('window');
-const getValues = (val) => {
-  return Array.isArray(val) ? val[0] : val;
-};
-
 
 export default function TimerPage({ route, navigation }) {
   const dispatch = useDispatch();
@@ -149,8 +160,8 @@ export default function TimerPage({ route, navigation }) {
     finalCookTime = cook ? getValues(cook) : getValues(cookData[cut][weight].cooks);
   }
 
-  if (hasNextStep && typeof finalCookTime === 'number') {
-    finalCookTime = getValues(cookData[activeCut][activeWeight].cooks);
+  if (hasNextStep && typeof finalCookTime === 'number') { 
+    finalCookTime = getValues(cookData[activeCut || cut][activeWeight || weight || 'sm'].cooks);
   }
 
   if (typeof finalCookTime === 'object') {
@@ -211,123 +222,143 @@ export default function TimerPage({ route, navigation }) {
     return unsubscribe;
   });
 
-  const doneContent = [
-    <View style={ styles.doneModal }>
-      <Text style={ styles.body }>{ nextTimer ? `${useTranslate('timer_ready')} ${rest / 60}min` : useTranslate('timer_ready_done')}</Text>
-      <View style={ styles.doneModalButtonContainer }>
-        { nextTimer ? (
-          <Button
-            as='primary'
-            text={ useTranslate('start_rest') }
-            onPress={ () => {
-              setDone(false);
-              setTime(rest);
-              setDisplay(rest);
-              navigation.navigate('Timer', { cut: activeCut, cookTime: rest });
-              dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0, type: 'rest', nextTimerType: null, activeWeight: weight || activeWeight }));
-              setShouldStart(true);
-              onDisplayNotification(rest, 0, locale);
-              setSheet(null);
-            }}
-          />
-        ) : null }
-        <Button
-          as='secondary_alt'
-          text={ useTranslate('got_it') }
-          onPress={ () => {
-            resetTime();
-            setSheet(null);
+  const onNextPress = (timeToSet) => {
+    setDone(false);
+    setTime(timeToSet);
+    setDisplay(timeToSet);
+    setShouldStart(true);
+    onDisplayNotification(timeToSet, 0, locale);
+    setSheet(null);
+  }
 
-            if (!nextTimer) navigation.navigate('Home');
-          }}
-        />
-      </View>
-    </View>
-  ];
-
-  const nextContent = [
-    <View style={ styles.doneModal }>
-      <Text style={ styles.body }>{ useTranslate('step_done')}</Text>
-      <View style={ styles.doneModalButtonContainer }>
+  const doneContent = (
+    <DoneModal
+      body={ nextTimer ? `${useTranslate('timer_ready')} ${rest / 60}min` : useTranslate('timer_ready_done') }
+    >
+      { nextTimer ? (
         <Button
           as='primary'
-          text={ useTranslate('start_next') }
+          text={ useTranslate('start_rest') }
           onPress={ () => {
-            setDone(false);
-            setTime(step2);
-            setDisplay(step2);
-            setShouldStart(true);
-            onDisplayNotification(step2, 0, locale);
-            navigation.navigate('Timer', { cut: activeCut, cookTime: step2 });
-            dispatch(startTimer({ cut, finalCookTime: step2, nextTimer: cookData[activeCut][activeWeight].rest, type: 'cook', nextTimerType: 'rest', activeWeight: weight || activeWeight, multiStepRest: rest }));
-            setSheet(null);
+            onNextPress(rest);
+            navigation.navigate('Timer', { cut: activeCut, cookTime: rest });
+            dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0, type: 'rest', nextTimerType: null, activeWeight: weight || activeWeight }));
           }}
         />
-        <Button
-          as='secondary_alt'
-          text={ useTranslate('cancelar') }
-          onPress={ () => {
-            resetTime();
-            setSheet(null);
-          }}
-        />
-      </View>
-    </View>
-  ];
+      ) : null }
+      <Button
+        as='secondary_alt'
+        text={ useTranslate('got_it') }
+        onPress={ () => {
+          resetTime();
+          setSheet(null);
+          navigation.navigate('Home');
+        }}
+      />
+    </DoneModal>
+  );
 
-  const cancelContent = [
-    <View style={ styles.doneModal }>
-      <Text style={ styles.body }>{ useTranslate('confirm_cancel_current')(formatTime(time), useTranslate(cut)) }</Text>
-      <View style={ styles.doneModalButtonContainer }>
-        <Button
-          as='primary'
-          text={ useTranslate('confirm_cancel') }
-          onPress={ () => {
-            setDone(false);
-            setTime(finalCookTime);
-            setDisplay(finalCookTime);
-            dispatch(stopTimer());
-            dispatch(resetTimer());
-            setSheet(null);
-            navigation.navigate('Home', { resetState: true });
-            notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
-          }}
-        />
-        <Button
-          as='secondary_alt'
-          text={ useTranslate('confirm_back') }
-          onPress={ () => setSheet(null) }
-        />
-      </View>
-    </View>
-  ];
+  const restContent = (
+    <DoneModal
+      body={ `${useTranslate('rest_info')} ${rest / 60}min` }
+    >
+      <Button
+        as='primary'
+        text={ useTranslate('start_rest') }
+        onPress={ () => {
+          resetTime();
+          onNextPress(rest);
+          navigation.navigate('Timer', { cut, cookTime: rest });
+          dispatch(startTimer({ cut, finalCookTime: rest, nextTimer: 0, type: 'rest', nextTimerType: null, activeWeight: weight || activeWeight }));
+        }}
+      />
+    </DoneModal>
+  );
 
-  const resetContent = [
-    <View style={ styles.doneModal }>
-      <Text style={ styles.body }>{useTranslate('confirm_reset_current')(formatTime(activeCookTime - elapsed/1000), useTranslate(activeCut))}</Text>
-      <View style={ styles.doneModalButtonContainer }>
-        <Button
-          as='primary'
-          text={ useTranslate('confirm_cancel')}
-          onPress={ () => {
-            setDone(false);
-            setTime(finalCookTime);
-            setDisplay(finalCookTime);
-            setShouldStart(true);
-            dispatch(startTimer({ cut, finalCookTime, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
-            onDisplayNotification(finalCookTime, 0, locale);
-            setSheet(null);
-            notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
-          }}
-        />
-        <Button
-          as='secondary_alt'
-          text={ useTranslate('confirm_back') }
-          onPress={ () => setSheet(null) }
-        />
-      </View>
-    </View>
-  ];
+  const nextContent = (
+    <DoneModal
+      body={ useTranslate('step_done') }
+    >
+      <Button
+        as='primary'
+        text={ useTranslate('start_next') }
+        onPress={ () => {
+          onNextPress(step2);
+          navigation.navigate('Timer', { cut: activeCut, cookTime: step2 });
+          dispatch(startTimer({ cut, finalCookTime: step2, nextTimer: cookData[activeCut][activeWeight].rest, type: 'cook', nextTimerType: 'rest', activeWeight: weight || activeWeight, multiStepRest: rest }));
+        }}
+      />
+      <Button
+        as='secondary_alt'
+        text={ useTranslate('cancelar') }
+        onPress={ () => {
+          resetTime();
+          setSheet(null);
+        }}
+      />
+    </DoneModal>
+  );
+
+  const nextInfoContent = (
+    <DoneModal
+      body={ useTranslate('next_step_info')(step2) }
+    >
+      <Button
+        as='secondary_alt'
+        text={ useTranslate('got_it') }
+        onPress={ () => {
+          setSheet(null);
+        }}
+      />
+    </DoneModal>
+  );
+
+  const cancelContent = (
+    <DoneModal
+      body={ useTranslate('confirm_cancel_current')(formatTime(time), useTranslate(cut)) }
+    >
+      <Button
+        as='primary'
+        text={ useTranslate('confirm_cancel') }
+        onPress={ () => {
+          setDone(false);
+          setTime(finalCookTime);
+          setDisplay(finalCookTime);
+          dispatch(stopTimer());
+          dispatch(resetTimer());
+          setSheet(null);
+          navigation.navigate('Home', { resetState: true });
+          notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
+        }}
+      />
+      <Button
+        as='secondary_alt'
+        text={ useTranslate('confirm_back') }
+        onPress={ () => setSheet(null) }
+      />
+    </DoneModal>
+  );
+
+  const resetContent = (
+    <DoneModal
+      body={ useTranslate('confirm_reset_current')(formatTime(activeCookTime - elapsed/1000), useTranslate(activeCut)) }
+    >
+      <Button
+        as='primary'
+        text={ useTranslate('confirm_cancel')}
+        onPress={ () => {
+          onNextPress(finalCookTime);
+          dispatch(startTimer({ cut, finalCookTime, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
+          notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
+        }}
+      />
+      <Button
+        as='secondary_alt'
+        text={ useTranslate('confirm_back') }
+        onPress={ () => setSheet(null) }
+      />
+    </DoneModal>
+  );
 
   const getSheetContent = () => {
     switch (sheet) {
@@ -337,8 +368,12 @@ export default function TimerPage({ route, navigation }) {
         return doneContent;
       case 'siguiente_paso':
         return nextContent;
+      case 'siguiente_info':
+        return nextInfoContent;
       case 'cancelar_presente':
         return resetContent;
+      case 'rest':
+        return restContent;
       default:
         return null;
     };
@@ -422,12 +457,22 @@ export default function TimerPage({ route, navigation }) {
         <StatusBar style="auto" />
       </ScrollView>
       { (rest || hasNextStep) && (
-        <View style={ styles.notice }>
-          <Image style={{ width: 24, height: 24 }} source={ require('../assets/images/icons/info.png') } />
-          <Text style={{ fontFamily: fontFamilies.paragraph, fontSize: textSizes.bodySmall }}>{ nextNotice }</Text>
-        </View>
-      )}
-      <BottomSheet backdropOnPress={ onSheetClose } isOpen={ sheet } offsetBottom={ insets.bottom } title={ sheet } hasActions>
+        <FloatingBar 
+          content={ nextNotice }
+          onPress={ () => {
+            if (cutHasSteps) return setSheet('siguiente_info');
+
+            setSheet('rest');
+          } }
+        />
+      ) }
+      <BottomSheet
+        backdropOnPress={ onSheetClose }
+        isOpen={ sheet }
+        offsetBottom={ insets.bottom }
+        title={ sheet } 
+        hasActions
+      >
         { getSheetContent() }
       </BottomSheet>
     </>

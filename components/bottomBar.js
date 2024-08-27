@@ -28,7 +28,9 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
     subtitle: {
       fontFamily: fontFamilies.paragraph,
       fontSize: textSizes.bodySmall,
-      color: colors.white
+      color: colors.white,
+      maxWidth: 210,
+      flexWrap: 'nowrap'
     },
     time: {
       fontFamily: fontFamilies.subhead,
@@ -116,8 +118,8 @@ export default function BottomBar({ offsetBottom, onLink, onBlur, onDone }) {
 
   return (
     <View style={ styles.container }>
-      <View style={ styles.timeContainer }>
-        <Text style={styles.subtitle}>{ getTranslation(subtitle, locale) } { cutInfo && `– ${getTranslation(cutInfo, locale)}` }</Text>
+      <View>
+        <Text style={ styles.subtitle }>{ getTranslation(subtitle, locale) } { cutInfo && `– ${getTranslation(cutInfo, locale)}` }</Text>
         <Text style={ styles.time }>{ formattedTime } </Text>
       </View>
       <View style={ styles.actions }>

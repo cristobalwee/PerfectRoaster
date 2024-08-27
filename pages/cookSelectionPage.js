@@ -14,7 +14,6 @@ export default function CookSelectionPage({ route, navigation }) {
   const { cut, weight } = route.params;
   const [selectedCook, setSelectedCook] = useState(0);
   const insets = useSafeAreaInsets();
-  const cookNames = { med_rare: 'A punto', med: 'Término medio', med_well: 'Medio cocido', well: 'Bien cocido' };
   const unitVals = { temp_celsius: 'ºC', temp_fahrenheit: 'ºF' };
   const locale = useSelector(selectLocale);
   const useTranslate = (string) => getTranslation(string, locale);
@@ -24,7 +23,6 @@ export default function CookSelectionPage({ route, navigation }) {
   const cook = cookData[cut][weight].cooks[cookId];
   const { temps } = cookData[cut][weight];
   const tempUnits = useSelector(selectTempUnits);
-  console.log(temps, cookVals);
   
   const styles = StyleSheet.create({
     container: {

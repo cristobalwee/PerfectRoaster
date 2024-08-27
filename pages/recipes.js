@@ -31,6 +31,7 @@ export default function RecipesScreen({ navigation }) {
           duration={ `${recipeList[locale][recipe].time}min` }
         />
       ))}
+      <View style={{ height: 36 }}></View>
       <StatusBar style="auto" />
     </ScrollView>
   );

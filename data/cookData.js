@@ -275,5 +275,19 @@ export const cookData = {
         'med_rare': { temp_celsius: '55-59', temp_fahrenheit: '131-138' }
       }
     }
+  },
+  'cuadril_cafe': {
+    'sm': {
+      weight: 1100,
+      cooks: 2520,
+      rest: 720
+    }
+  },
+  'pollo_brasa': {
+    'sm': {
+      weight: 1800,
+      cooks: 4200,
+      rest: 420
+    }
   }
 };

@@ -1,12 +1,12 @@
-import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store } from './store';
 import { Provider } from 'react-redux';
 import AppContainer from './AppContainer';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { storage } from './utils/storage';
 import notifee, { EventType } from '@notifee/react-native';
+import { AppState } from 'react-native';
 
 // https://www.reactnative.university/blog/live-activities-unleashed
 // https://medium.com/@rafiulansari/building-a-react-native-app-part-iv-onboarding-screens-6ef48caefd6c 
@@ -19,16 +19,39 @@ export default function App() {
   const [tempUnits, setTemp] = useState('temp_celsius')
   const [weightUnits, setWeight] = useState('weight_gr');
 
-  const [fontsLoaded, fontError] = useFonts({
-    'Intro': require('./assets/fonts/Intro.otf'),
-    'Poppins-Regular': require('./assets/fonts/Poppins-Regular.ttf'),
-    'Poppins-SemiBold': require('./assets/fonts/Poppins-SemiBold.ttf')
-  });
+  // const [fontsLoaded, fontError] = useFonts({
+  //   'Intro': require('./assets/fonts/Intro.otf'),
+  //   'Poppins-Regular': require('./assets/fonts/Poppins-Regular.otf'),
+  //   'Poppins-SemiBold': require('./assets/fonts/Poppins-SemiBold.otf')
+  // });
 
-  if (!fontsLoaded && !fontError) {
-    console.log('loading');
-    return null;
-  };
+  // if (!fontsLoaded && !fontError) {
+  //   console.log('loading');
+  //   return <Text>Loading</Text>;
+  // };
+
+  // const appState = useRef(AppState.currentState);
+  // const [appStateVisible, setAppStateVisible] = useState(appState.current);
+
+  // useEffect(() => {
+  //   const subscription = AppState.addEventListener('change', nextAppState => {
+  //     if (
+  //       appState.current.match(/inactive|background/) &&
+  //       nextAppState === 'active'
+  //     ) {
+  //       console.log('App has come to the foreground!');
+  //       console.log(fontsLoaded, fontError);
+  //     }
+
+  //     appState.current = nextAppState;
+  //     setAppStateVisible(appState.current);
+  //     console.log('AppState', appState.current);
+  //   });
+
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, []);
 
   notifee.onBackgroundEvent(async ({ type, detail }) => {
     if (type === EventType.PRESS) {
