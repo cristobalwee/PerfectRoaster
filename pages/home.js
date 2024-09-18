@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ScrollView, View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Hero from '../components/hero';
 import { colors, fontFamilies, spacing, textSizes, borderRadius } from '../constants/styles';
@@ -51,19 +51,12 @@ export default function HomeScreen({ route, navigation }) {
   const hasNextStep = timerType ? timerType === 'cook' && nextTimerType !== 'rest' : cutHasSteps;
 
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.boxBackground,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-      marginBottom: isStarted ? 100 : null
-    },
     section: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.md
     },
     subHeadingContainer: {
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: spacing.md,
       marginTop: spacing.lg,
       marginBottom: spacing.sm,
       flex: 1,
@@ -186,29 +179,31 @@ export default function HomeScreen({ route, navigation }) {
       default:
         return <CutList sheet={ sheet } onPress={ (link) => link(navigation) } />
     };
-  }
+  };
 
   return (
     <Fragment>
-      <ScrollView style={styles.container}>
-        <Hero
-          background={ require('../assets/images/hero_home.jpg') }
-          title={ useTranslate('home_hero') }
-          eyebrow={ currentDate }
-          rightAction={ () => setSheet('ajustes') }
-        />
-        <View style={ styles.section }>
-          <CardSection onPress={ onCardPress } />
+      <Hero
+        background={ require('../assets/images/hero_home.jpg') }
+        title={ useTranslate('home_hero') }
+        eyebrow={ currentDate }
+        rightAction={ () => setSheet('ajustes') }
+        bottomOffset={ isStarted ? 100 : null }
+      >
+        <View style={{ backgroundColor: colors.boxBackground }}>
+          <View style={ styles.section }>
+            <CardSection onPress={ onCardPress } />
+          </View>
+          <View style={ styles.subHeadingContainer }>
+            <Text style={ styles.subHeading }>{ useTranslate('recipes') }</Text>
+            <Button as='link' text={ useTranslate('view_more') } onPress={ () => navigation.navigate('Recipes') } />
+          </View>
+          <RecipeScrollView onPress={ (locale, recipe) => navigation.navigate('Recipe', { recipe: recipeList[locale][recipe] }) } />
         </View>
-        <View style={ styles.subHeadingContainer }>
-          <Text style={ styles.subHeading }>{ useTranslate('recipes') }</Text>
-          <Button as='link' text={ useTranslate('view_more') } onPress={ () => navigation.navigate('Recipes') } />
-        </View>
-        <RecipeScrollView onPress={ (locale, recipe) => navigation.navigate('Recipe', { recipe: recipeList[locale][recipe] }) } />
         {/* <Button as='link' text='Clear' onPress={ clearAll } /> */}
         <View style={{ height: 36 + insets.bottom }}></View>
         <StatusBar style='light' />
-      </ScrollView>
+      </Hero>
       <BottomSheet
         backdropOnPress={ onSheetClose }
         isOpen={ sheet }

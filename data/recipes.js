@@ -150,7 +150,7 @@ export default {
     },
     'pollo_brasa': {
       id: 'pollo_brasa',
-      title: 'Peruvian Style Rotisserie Chicken',
+      title: 'Peruvian Style Chicken',
       img: require('../assets/images/pollo_brasa.jpg'),
       time: 80,
       description: 'Use the medium burner – these times have been calculated with that in mind.',

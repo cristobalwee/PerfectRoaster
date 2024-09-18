@@ -18,7 +18,7 @@ export default function OnboardingRecs({ navigation }) {
     container: {
       flex: 1,
       backgroundColor: colors.black,
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: spacing.md,
       paddingTop: spacing.lg + insets.top,
       paddingBottom: spacing.lg + insets.bottom,
       gap: 48
@@ -50,8 +50,8 @@ export default function OnboardingRecs({ navigation }) {
     buttonContainer: {
       position: 'absolute',
       bottom: spacing.lg + insets.bottom,
-      left: spacing.lg,
-      right: spacing.lg,
+      left: spacing.md,
+      right: spacing.md,
       gap: spacing.md
     }
   });

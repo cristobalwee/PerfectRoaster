@@ -40,13 +40,13 @@ export default function WeightSelectionPage({ route, navigation }) {
     container: {
       flex: 1,
       backgroundColor: colors.boxBackground,
-      padding: spacing.lg
+      padding: spacing.md
     },
     buttonContainer: {
       position: 'absolute',
       bottom: spacing.lg + insets.bottom,
-      left: spacing.lg,
-      right: spacing.lg
+      left: spacing.md,
+      right: spacing.md
     },
     subHeading: {
       fontFamily: fontFamilies.subhead,

@@ -206,8 +206,8 @@ export const cookData = {
     'sm': { 
       weight: 1000, 
       cooks: {
-        'step1': [12, 5400], 
-        'step2': [10, 3600]
+        'step1': [4800, 5400], 
+        'step2': [2400, 3600]
       },
       rest: 420
     }
@@ -223,8 +223,8 @@ export const cookData = {
     'lg': { 
       weight: 600,
       cooks: {
-        'step1': [12, 2700], 
-        'step2': [10, 3000]
+        'step1': [2400, 2700], 
+        'step2': [2700, 3000]
       },
       rest: 360
     },
@@ -258,8 +258,8 @@ export const cookData = {
   'cuy_entero': {
     'sm': {
       weight: 430,
-      cooks: 10,
-      rest: 12
+      cooks: [3180, 3300],
+      rest: 120
     }
   },
   'pato_magret': {

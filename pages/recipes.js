@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.boxBackground,
-    padding: spacing.lg,
+    padding: spacing.md,
     position: 'relative'
   },
 });

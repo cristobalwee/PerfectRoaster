@@ -37,6 +37,7 @@ import getValues from '../utils/getValues';
 // https://notifee.app/react-native/docs/overview 
 // https://www.notjust.dev/blog/2023-02-02-react-native-local-push-notifications
 // https://dev.to/medaimane/background-processing-in-react-native-exploring-techniques-for-efficient-task-handling-2cbf#:~:text=React%20Native%20Background%20Fetch,in%20the%20background%20or%20terminated.
+// https://github.com/rgommezz/react-native-animated-stopwatch-timer
 
 const windowDimensions = Dimensions.get('window');
 
@@ -72,7 +73,7 @@ export default function TimerPage({ route, navigation }) {
   const styles = StyleSheet.create({
     container: {
       backgroundColor: colors.boxBackground,
-      padding: spacing.lg,
+      padding: spacing.md,
       paddingTop: windowDimensions.height * 0.1
     },
     svgContainer: {
@@ -113,24 +114,6 @@ export default function TimerPage({ route, navigation }) {
       flexDirection: 'row',
       paddingHorizontal: spacing.xs,
       gap: spacing.sm
-    },
-    notice: {
-      position: 'absolute',
-      bottom: spacing.sm + insets.bottom,
-      left: spacing.lg,
-      right: spacing.lg,
-      borderRadius: 16,
-      backgroundColor: colors.white,
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.md,
-      shadowColor: '#000',
-      shadowOffset: {width: 0, height: 1},
-      shadowOpacity: 0.02,
-      shadowRadius: 8,
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-      flexDirection: 'row',
-      gap: spacing.xs
     },
     body: {
       fontFamily: fontFamilies.paragraph,
@@ -387,7 +370,7 @@ export default function TimerPage({ route, navigation }) {
         <View style={ styles.svgContainer }>
           <View style={ styles.timeContainer }>
             <Text style={ styles.subtitle }>{ useTranslate(timeTitle) }</Text>
-            <Text style={ styles.time }>{ formatTime(time) }</Text>
+            <Text allowFontScaling={ false } style={ styles.time }>{ formatTime(time) }</Text>
             { (hasNextStep || (cutHasSteps && timerType === 'cook'))
               && <View style={ styles.steps }><Text style={ styles.stepsText }>{ useTranslate(stepCounter) }</Text></View> }
           </View>

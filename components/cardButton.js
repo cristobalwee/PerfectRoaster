@@ -1,6 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useFonts } from 'expo-font';
 import { fontFamilies, colors, textSizes, spacing, borderRadius, circleRadius } from '../constants/styles';
 
 const styles = StyleSheet.create({
@@ -14,12 +12,12 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.06,
     shadowRadius: 10,
-    gap: spacing.sm,
-    paddingVertical: spacing.md
+    gap: spacing.xs,
+    paddingVertical: spacing.lg
   },
   iconContainer: {
-    width: 56,
-    height: 56,
+    width: 50,
+    height: 50,
     borderRadius: circleRadius,
     backgroundColor: colors.black,
     flex: 1,
@@ -27,8 +25,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   icon: {
-    width: 38,
-    height: 38,
+    width: 32,
+    height: 32,
   },
   text: {
     fontFamily: fontFamilies.paragraph,

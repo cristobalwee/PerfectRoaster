@@ -23,21 +23,22 @@ export default function BottomSheet({ offsetBottom, title, children, isOpen, bac
   const styles = StyleSheet.create({
     backdrop: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: 'rgba(17, 17, 17, 0.6)'
+      backgroundColor: 'rgba(17, 17, 17, 0.6)',
+      zIndex: 1
     },
     view: {
       backgroundColor: 'white',
       width: '100%',
       position: 'absolute',
       bottom: 0,
-      zIndex: 1,
+      zIndex: 2,
       borderTopLeftRadius: 16,
       borderTopRightRadius: 16,
     },
     header: {
       borderBottomColor: colors.border,
       borderBottomWidth: 1,
-      padding: spacing.md
+      padding: spacing.sm
     },
     title: {
       fontSize: textSizes.navHeader,
@@ -47,17 +48,17 @@ export default function BottomSheet({ offsetBottom, title, children, isOpen, bac
     },
     close: {
       position: 'absolute',
-      top: spacing.md,
-      right: spacing.lg,
+      padding: spacing.sm,
+      right: 4,
       zIndex: 2
     },
     closeIcon: {
-      height: 24,
-      width: 24
+      height: 22,
+      width: 22
     },
     content: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.md,
       paddingBottom: hasActions && offsetBottom ? 0 : spacing.lg,
       gap: spacing.md,
       marginBottom: offsetBottom
@@ -91,7 +92,7 @@ export default function BottomSheet({ offsetBottom, title, children, isOpen, bac
       <PressAnimated
         onPress={backdropOnPress}
         entering={FadeIn.duration(300)}
-        exiting={FadeOut.duration(600)}
+        exiting={FadeOut.duration(200)}
         style={styles.backdrop}
       />
       <Animated.View

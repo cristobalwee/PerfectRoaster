@@ -8,8 +8,8 @@ export default function FloatingBar({ content, onPress, isRecipe }) {
     notice: {
       position: 'absolute',
       bottom: spacing.sm + insets.bottom,
-      left: spacing.lg,
-      right: spacing.lg,
+      left: spacing.md,
+      right: spacing.md,
       borderRadius: 16,
       backgroundColor: colors.white,
       paddingHorizontal: spacing.md,

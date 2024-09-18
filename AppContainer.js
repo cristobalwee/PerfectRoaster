@@ -35,16 +35,16 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
     Poppins_SemiBold: require('./assets/fonts/Poppins-SemiBold.otf')
   });
 
-  if (!fontsLoaded && !fontError) {
-    console.log('loading');
-    return <Text>Loading</Text>;
-  };
-
   useEffect(() => {
     dispatch(setLocale(locale));
     dispatch(setTempUnits(tempUnits));
     dispatch(setWeightUnits(weightUnits));
   }, [onboarded, locale, tempUnits, weightUnits]);
+
+  if (!fontsLoaded && !fontError) {
+    console.log('loading');
+    return <Text>Loading</Text>;
+  };
 
   const getBackButton = (back) => (
     <Pressable onPress={ back }>

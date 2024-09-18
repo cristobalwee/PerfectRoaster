@@ -32,7 +32,7 @@ export default function OnboardingIntro({ navigation }) {
     },
     contentContainer: {
       flex: 4,
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: spacing.md,
       paddingTop: spacing.lg,
       paddingBottom: spacing.lg + insets.bottom,
       justifyContent: 'flex-start',
@@ -51,8 +51,8 @@ export default function OnboardingIntro({ navigation }) {
     buttonContainer: {
       position: 'absolute',
       bottom: spacing.lg + insets.bottom,
-      left: spacing.lg,
-      right: spacing.lg,
+      left: spacing.md,
+      right: spacing.md,
       gap: spacing.md
     }
   });

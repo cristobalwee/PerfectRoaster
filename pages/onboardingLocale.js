@@ -16,7 +16,7 @@ export default function OnboardingLocales({ navigation }) {
       flex: 1,
       justifyContent: 'space-between',
       backgroundColor: colors.black,
-      paddingHorizontal: spacing.lg,
+      paddingHorizontal: spacing.md,
       paddingTop: insets.top,
       paddingBottom: spacing.lg + insets.bottom
     },
@@ -29,8 +29,8 @@ export default function OnboardingLocales({ navigation }) {
     buttonContainer: {
       position: 'absolute',
       bottom: spacing.lg + insets.bottom,
-      left: spacing.lg,
-      right: spacing.lg,
+      left: spacing.md,
+      right: spacing.md,
       gap: spacing.md
     }
   });

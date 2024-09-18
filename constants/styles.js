@@ -1,7 +1,7 @@
 export const textSizes = {
   header1: 32,
   header2: 24,
-  navHeader: 20,
+  navHeader: 18,
   heroText: 54,
   body: 16,
   bodySmall: 14,

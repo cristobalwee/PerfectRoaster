@@ -15,19 +15,19 @@ export const cuts = {
     { 
       id: 'pollo_entero',
       weights: [1800, 2300],
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/pollo_entero.png') } />,
+      media: require('../assets/images/pollo_entero.png'),
       link: (navigation) => navigation.navigate('WeightSelection', { cut: 'pollo_entero' })
     },
     { 
       id: 'pollo_pechuga',
       weights: [500, 700],
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/pollo_pechuga.png') } />,
+      media: require('../assets/images/pollo_pechuga.png'),
       link: (navigation) => navigation.navigate('WeightSelection', { cut: 'pollo_pechuga' })
     },
     { 
       id: 'pollo_pierna',
       weights: 300,
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/pollo_pierna.png') } />,
+      media: require('../assets/images/pollo_pierna.png'),
       link: (navigation) => navigation.navigate('WeightSelection', { cut: 'pollo_pierna' })
     }
   ],
@@ -35,31 +35,31 @@ export const cuts = {
     { 
       id: 'res_t_bone',
       weights: 500,
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/res_t_bone.png') } />,
+      media: require('../assets/images/res_t_bone.png'),
       link: (navigation) => navigation.navigate('CookSelection', { cut: 'res_t_bone', weight: 'sm' })
     },
     { 
       id: 'res_bife_ancho',
       weights: [500, 1000],
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/res_bife_ancho.png') } />,
+      media: require('../assets/images/res_bife_ancho.png'),
       link: (navigation) => navigation.navigate('WeightSelection', { cut: 'res_bife_ancho' })
     },
     { 
       id: 'res_lomo',
       weights: [600, 800],
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/res_lomo.png') } />,
+      media: require('../assets/images/res_lomo.png'),
       link: (navigation) => navigation.navigate('WeightSelection', { cut: 'res_lomo' })
     },
     { 
       id: 'res_cuadril',
       weights: 1100,
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/res_cuadril.png') } />,
+      media: require('../assets/images/res_cuadril.png'),
       link: (navigation) => navigation.navigate('CookSelection', { cut: 'res_cuadril', weight: 'sm' })
     },
     { 
       id: 'res_picanha',
       weights: [1000, 1500],
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/res_picana.png') } />,
+      media: require('../assets/images/res_picana.png'),
       link: (navigation) => navigation.navigate('WeightSelection', { cut: 'res_picanha' })
     }
   ],
@@ -67,31 +67,31 @@ export const cuts = {
     { 
       id: 'cerdo_solomillo',
       weights: [300, 700],
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/cerdo_solomillo.png') } />,
+      media: require('../assets/images/cerdo_solomillo.png'),
       link: (navigation) => navigation.navigate('WeightSelection', { cut: 'cerdo_solomillo' })
     },
     { 
       id: 'cerdo_bondiola',
       weights: 1900,
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/cerdo_bondiola.png') } />,
+      media: require('../assets/images/cerdo_bondiola.png'),
       link: (navigation) => navigation.navigate('Timer', { cut: 'cerdo_bondiola', weight: 'sm' })
     },
     { 
       id: 'cerdo_panceta',
       weights: [400, 600],
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/cerdo_panceta.png') } />,
+      media: require('../assets/images/cerdo_panceta.png'),
       link: (navigation) => navigation.navigate('WeightSelection', { cut: 'cerdo_panceta' })
     },
     { 
       id: 'cerdo_costillas',
       weights: 1000,
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/cerdo_costillas.png') } />,
+      media: require('../assets/images/cerdo_costillas.png'),
       link: (navigation) => navigation.navigate('MultiStep', { cut: 'cerdo_costillas', weight: 'sm' })
     },
     { 
       id: 'cerdo_picana',
       weights: [400, 600],
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/cerdo_picana.png') } />,
+      media: require('../assets/images/cerdo_picana.png'),
       link: (navigation) => navigation.navigate('Timer', { cut: 'cerdo_picana', weight: 'sm' })
     },
   ],
@@ -99,7 +99,7 @@ export const cuts = {
     { 
       id: 'cordero_costillar',
       weights: 800,
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/cordero_costillar.png') } />,
+      media: require('../assets/images/cordero_costillar.png'),
       link: (navigation) => navigation.navigate('CookSelection', { cut: 'cordero_costillar', weight: 'sm'})
     }
   ],
@@ -107,7 +107,7 @@ export const cuts = {
     { 
       id: 'cuy_entero',
       weights: 400,
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/hero_home.jpg') } />,
+      media: require('../assets/images/hero_home.jpg'),
       link: (navigation) => navigation.navigate('Timer', { cut: 'cuy_entero', weight: 'sm' })
     }
   ],
@@ -115,7 +115,7 @@ export const cuts = {
     { 
       id: 'pato_magret',
       weights: 300,
-      media: <Image style={ styles.pivotImage } source={ require('../assets/images/pato_magret.png') } />,
+      media: require('../assets/images/pato_magret.png'),
       link: (navigation) => navigation.navigate('CookSelection', { cut: 'pato_magret', weight: 'sm' })
     }
   ]

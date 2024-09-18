@@ -10,8 +10,8 @@ const styles = StyleSheet.create({
   row: {
     flex: 1,
     flexDirection: 'row',
-    gap: spacing.xs,
-    marginBottom: spacing.xs
+    gap: 8,
+    marginBottom: 8
   }
 });
 

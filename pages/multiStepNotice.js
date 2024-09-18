@@ -22,18 +22,13 @@ export default function MultiStepNoticePage({ route, navigation }) {
     container: {
       flex: 1,
       backgroundColor: colors.boxBackground,
-      padding: spacing.lg
+      padding: spacing.md
     },
     buttonContainer: {
       position: 'absolute',
       bottom: spacing.lg + insets.bottom,
-      left: spacing.lg,
-      right: spacing.lg
-    },
-    subHeading: {
-      fontFamily: fontFamilies.subhead,
-      fontSize: textSizes.navHeader,
-      marginBottom: spacing.xs
+      left: spacing.md,
+      right: spacing.md
     },
     pageTitle: {
       fontFamily: fontFamilies.subhead,
@@ -104,7 +99,7 @@ export default function MultiStepNoticePage({ route, navigation }) {
         <View style={ styles.step }>
           <View style={ styles.innerStep }>
             <View style={ styles.stepImg }>
-              <Text style={ styles.stepTime }>{ formatTime(cooks.step1[0]) }</Text>
+              <Text style={ styles.stepTime }>{ cooks.step1[0]/60 }min</Text>
               <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
             </View>
             <View style={ styles.stepDetail }>
@@ -118,7 +113,7 @@ export default function MultiStepNoticePage({ route, navigation }) {
         <View style={ styles.step }>
           <View style={ styles.innerStep }>
             <View style={ styles.stepImg }>
-              <Text style={ styles.stepTime }>{ formatTime(cooks.step2[0]) }</Text>
+              <Text style={ styles.stepTime }>{ cooks.step2[0]/60 }min</Text>
               <View style={ styles.stepIcons }>
                 <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />
                 <Image style={{ height: 15, width: 10 }} source={ require('../assets/images/logo_flame.png') } />

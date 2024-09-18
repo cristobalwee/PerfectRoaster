@@ -15,13 +15,10 @@ import Button from '../components/button';
 import { startTimer } from '../timerSlice';
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.boxBackground
-  },
   content: {
-    padding: spacing.lg,
-    paddingBottom: 108
+    padding: spacing.md,
+    paddingBottom: 108,
+    backgroundColor: colors.boxBackground
   },
   sectionTitle: {
     fontFamily: fontFamilies.subhead,
@@ -61,14 +58,13 @@ export default function RecipeScreen({ route, navigation }) {
 
   return (
     <Fragment>
-      <ScrollView style={styles.container}>
-        <Hero
-          background={ img }
-          title={ title }
-          eyebrow={ `${time}min` }
-          back={ () => navigation.goBack() }
-          size='sm'
-        />
+      <Hero
+        background={ img }
+        title={ title }
+        eyebrow={ `${time}min` }
+        back={ () => navigation.goBack() }
+        size='sm'
+      >
         <View style={styles.content}>
           <Text style={styles.sectionTitle}>{ useTranslate('ingredients') }</Text>
           <View style={styles.subSection}>
@@ -89,7 +85,7 @@ export default function RecipeScreen({ route, navigation }) {
           </View>
         </View>
         <StatusBar style="light" />
-      </ScrollView>
+      </Hero>
       <FloatingBar content={ useTranslate('start_recipe') } onPress={ () => setSheet(true) } isRecipe />
       <BottomSheet
         backdropOnPress={ onSheetClose }
