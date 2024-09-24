@@ -35,7 +35,7 @@ export default function Hero({ eyebrow, title, back, background, size = 'lg', ri
       flex: 1,
       justifyContent: 'flex-end',
       padding: spacing.md,
-      height: heroHeight
+      minHeight: heroHeight
     },
     overlay: {
       backgroundColor: 'rgba(0, 0, 0, 0.55)',
@@ -64,7 +64,7 @@ export default function Hero({ eyebrow, title, back, background, size = 'lg', ri
       right: 0,
       backgroundColor:
       colors.black,
-      padding: spacing.md,
+      padding: spacing.sm,
       paddingTop: insets.top
     },
     headerText: {

@@ -289,5 +289,47 @@ export const cookData = {
       cooks: 4200,
       rest: 420
     }
+  },
+  'pollo_jerk': {
+    'sm': {
+      weight: 1800,
+      cooks: 4200,
+      rest: 420
+    }
+  },
+  'pollo_sillao': {
+    'sm': {
+      weight: 1800,
+      cooks: 4200,
+      rest: 420
+    }
+  },
+  'pollo_cajun': {
+    'sm': {
+      weight: 1800,
+      cooks: 4200,
+      rest: 420
+    }
+  },
+  'pollo_indio': {
+    'sm': {
+      weight: 1800,
+      cooks: 4200,
+      rest: 300
+    }
+  },
+  'pollo_pachamanquero': {
+    'sm': {
+      weight: 1800,
+      cooks: 4200,
+      rest: 420
+    }
+  },
+  'lomo_finas_hierbas': {
+    'sm': {
+      weight: 1100,
+      cooks: 2100,
+      rest: 600
+    }
   }
 };

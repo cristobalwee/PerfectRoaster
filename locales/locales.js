@@ -62,6 +62,7 @@ export const locales = {
     'rest_info': 'Para maximizar el sabor y la jugosidad, te recomendamos reposar tu carne por',
     'start_recipe': 'Comenzar Cocción',
     'siguiente_info': 'Siguiente Paso',
+    'marinade': 'Marinado',
 
     'start_recipe_info': (time, rest) => `Listo para comenzar un temporizador por ${time/60}min, con ${rest/60}min de reposo?`,
     'next_step': (step2) => `Siguiente paso: ${step2}min a fuego alto`,
@@ -160,6 +161,7 @@ export const locales = {
     'rest_info': 'To maximize flavor and juiciiness, we recommend resting your meat for',
     'start_recipe': 'Start Cooking',
     'siguiente_info': 'Next Step',
+    'marinade': 'Marinade',
     
     'start_recipe_info': (time, rest) => `Ready to start a timer for ${time/60}min, followed by ${rest/60}min of rest?`,
     'next_step': (step2) => `Next step: ${step2}min on high heat`,

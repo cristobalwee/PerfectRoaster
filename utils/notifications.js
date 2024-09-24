@@ -27,6 +27,8 @@ export async function onDisplayNotification(cookTime, elapsedTime, locale) {
     ios: {
       interruptionLevel: 'timeSensitive',
       critical: true,
+      criticalVolume: 1.0,
+      criticalAlert: true,
       sound: 'default'
     }
   }, trigger);

@@ -196,7 +196,7 @@ export default function HomeScreen({ route, navigation }) {
           </View>
           <View style={ styles.subHeadingContainer }>
             <Text style={ styles.subHeading }>{ useTranslate('recipes') }</Text>
-            <Button as='link' text={ useTranslate('view_more') } onPress={ () => navigation.navigate('Recipes') } />
+            {/* <Button as='link' text={ useTranslate('view_more') } onPress={ () => navigation.navigate('Recipes') } /> */}
           </View>
           <RecipeScrollView onPress={ (locale, recipe) => navigation.navigate('Recipe', { recipe: recipeList[locale][recipe] }) } />
         </View>

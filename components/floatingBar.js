@@ -27,7 +27,8 @@ export default function FloatingBar({ content, onPress, isRecipe }) {
       justifyContent: 'flex-start',
       alignItems: 'center',
       flexDirection: 'row',
-      gap: spacing.xs
+      gap: spacing.xs,
+      maxWidth: '90%'
     },
     leftIcon: {
       width: 24,
@@ -49,7 +50,7 @@ export default function FloatingBar({ content, onPress, isRecipe }) {
             <Image style={ styles.leftIcon } source={ require('../assets/images/icons/info.png') } />
           )
         }
-        <Text style={{ fontFamily: fontFamilies.paragraph, fontSize: textSizes.bodySmall }}>{ content }</Text>
+        <Text style={{ fontFamily: fontFamilies.paragraph, fontSize: textSizes.bodySmall, flex: 1, flexWrap: 'wrap' }}>{ content }</Text>
       </View>
       <Image style={ styles.rightIcon } source={ require('../assets/images/icons/chevron-right.png') } />
     </Pressable>

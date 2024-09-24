@@ -71,12 +71,22 @@ export default function RecipeScreen({ route, navigation }) {
             <Text style={styles.item}>{ useTranslate('meat') }</Text>
             <Text style={[styles.item, { paddingLeft: spacing.xs }]}>{`\u2022 ${ingredients.meat}`}</Text>
           </View>
-          <View style={styles.subSection}>
-            <Text style={styles.item}>Rub</Text>
-            { ingredients.rub.map(item => (
-              <Text key={item} style={[styles.item, { paddingLeft: spacing.xs }]}>{`\u2022 ${item}`}</Text>
-            ))}
-          </View>
+          { ingredients.rub && (
+            <View style={styles.subSection}>
+              <Text style={styles.item}>Rub</Text>
+              { ingredients.rub.map(item => (
+                <Text key={item} style={[styles.item, { paddingLeft: spacing.xs }]}>{`\u2022 ${item}`}</Text>
+              ))}
+            </View>
+          )}
+          { ingredients.marinade && (
+            <View style={styles.subSection}>
+              <Text style={styles.item}>{ useTranslate('marinade') }</Text>
+              { ingredients.marinade.map(item => (
+                <Text key={item} style={[styles.item, { paddingLeft: spacing.xs }]}>{`\u2022 ${item}`}</Text>
+              ))}
+            </View>
+          )}
           <Text style={[styles.sectionTitle, { marginBottom: spacing.sm }]}>{ useTranslate('procedure') }</Text>
           <View style={styles.subSection}>
             { procedure.map((item, i) => (

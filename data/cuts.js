@@ -107,7 +107,7 @@ export const cuts = {
     { 
       id: 'cuy_entero',
       weights: 400,
-      media: require('../assets/images/hero_home.jpg'),
+      media: require('../assets/images/cuy_entero.webp'),
       link: (navigation) => navigation.navigate('Timer', { cut: 'cuy_entero', weight: 'sm' })
     }
   ],
