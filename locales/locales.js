@@ -158,7 +158,7 @@ export const locales = {
     'multi_step_2_description': (time) => `Cook your meat on high heat ${ time/60 }min`,
     'mid_step': 'Remove the meat and clean the juice recepatcle before moving on to step 2.',
     'rest': 'Rest',
-    'rest_info': 'To maximize flavor and juiciiness, we recommend resting your meat for',
+    'rest_info': 'To maximize flavor and juiciness, we recommend resting your meat for',
     'start_recipe': 'Start Cooking',
     'siguiente_info': 'Next Step',
     'marinade': 'Marinade',

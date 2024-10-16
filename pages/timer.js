@@ -125,6 +125,7 @@ export default function TimerPage({ route, navigation }) {
     }
   });
 
+  // Circle SVG dimensions
   const size = 340;
   const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;

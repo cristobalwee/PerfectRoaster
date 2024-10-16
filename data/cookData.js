@@ -63,7 +63,7 @@ export const cookData = {
       weight: 1000,
       cooks: {
         'well': [3000, 3300],
-        'med_well': [2880, 2700],
+        'med_well': [2700, 2880],
         'med': [2400, 2520],
         'med_rare': 2040
       },
@@ -78,9 +78,9 @@ export const cookData = {
     'sm': {
       weight: 500,
       cooks: {
-        'well': [1320, 1260],
-        'med_well': [1140, 1140],
-        'med': [1020, 960],
+        'well': 1260,
+        'med_well': 1140,
+        'med': 960,
         'med_rare': 840
       },
       rest: 480,
@@ -96,10 +96,10 @@ export const cookData = {
     'lg': {
       weight: 800,
       cooks: {
-        'well': [3720, 3420],
-        'med_well': [3360, 3000],
-        'med': [3000, 2760],
-        'med_rare': [2400, 2160]
+        'well': [3420, 3720],
+        'med_well': [3000, 3360],
+        'med': [2760, 3000],
+        'med_rare': [2160, 2400]
       },
       rest: 600,
       temps: { 
@@ -112,10 +112,10 @@ export const cookData = {
     'sm': {
       weight: 600,
       cooks: {
-        'well': [3540, 3240],
-        'med_well': [3180, 2880],
-        'med': [2880, 2640],
-        'med_rare': [2280, 2040]
+        'well': [3240, 3540],
+        'med_well': [2880, 3180],
+        'med': [2640, 2880],
+        'med_rare': [2040, 2280]
       },
       rest: 480,
       temps: { 
@@ -131,9 +131,9 @@ export const cookData = {
       weight: 1100,
       cooks: {
         'well': [3720, 4200],
-        'med_well': [3600, 3000],
-        'med': [2880, 2520],
-        'med_rare': [2520, 2400]
+        'med_well': [3000, 3600],
+        'med': [2520, 2880],
+        'med_rare': [2400, 2520]
       },
       rest: 600,
       temps: { 
@@ -150,7 +150,7 @@ export const cookData = {
       cooks: {
         'well': [3600, 3900],
         'med_well': [3300, 3600],
-        'med': [3000, 3000],
+        'med': 3000,
         'med_rare': 2700
       },
       rest: 720,
@@ -164,8 +164,8 @@ export const cookData = {
     'sm': {
       weight: 1000,
       cooks: {
-        'well': [3480, 3300],
-        'med_well': [3120, 3000],
+        'well': [3300, 3480],
+        'med_well': [3000, 3120],
         'med': 2880,
         'med_rare': 2520
       },
@@ -266,8 +266,8 @@ export const cookData = {
     'sm': {
       weight: 300,
       cooks: {
-        'med': [1920, 1800],
-        'med_rare': [1680, 1440]
+        'med': [1800, 1920],
+        'med_rare': [1440, 1680]
       },
       rest: 360,
       temps: {
