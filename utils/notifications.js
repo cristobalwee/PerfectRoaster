@@ -3,8 +3,11 @@ import getTranslation from './getTranslation';
 
 // https://stackoverflow.com/questions/74319959/react-native-navigate-to-particular-screen-when-notification-is-clicked-in-notif
 
-export async function onDisplayNotification(cookTime, elapsedTime, locale) {
+export async function getNotifPerms() {
   await notifee.requestPermission({ criticalAlert: true });
+}
+
+export async function onDisplayNotification(cookTime, elapsedTime, locale) {
   const trigger = {
     type: TriggerType.TIMESTAMP,
     timestamp: Date.now() + ((cookTime - elapsedTime/1000) * 1000) + 500

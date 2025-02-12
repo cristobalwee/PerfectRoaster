@@ -8,6 +8,7 @@ import getTranslation from '../utils/getTranslation';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLocale, setOnboarded } from '../storageSlice';
 import { storage } from '../utils/storage';
+import { getNotifPerms } from '../utils/notifications';
 
 export default function OnboardingRecs({ navigation }) {
   const insets = useSafeAreaInsets();
@@ -21,7 +22,7 @@ export default function OnboardingRecs({ navigation }) {
       paddingHorizontal: spacing.md,
       paddingTop: spacing.lg + insets.top,
       paddingBottom: spacing.lg + insets.bottom,
-      gap: 48
+      gap: 40
     },
     eyebrow: {
       fontFamily: fontFamilies.paragraph,
@@ -68,6 +69,10 @@ export default function OnboardingRecs({ navigation }) {
         <Text style={ styles.itemText }>{ useTranslate('recs_burner') }</Text>
       </View>
       <View style={ styles.item }>
+        <Image style={{ height: 40, width: 40 }} source={ require('../assets/images/ringer.png') } />
+        <Text style={ styles.itemText }>{ useTranslate('recs_ringer') }</Text>
+      </View>
+      <View style={ styles.item }>
         <Image style={{ height: 40, width: 40 }} source={ require('../assets/images/temperatura.png') } />
         <Text style={ styles.itemText }>{ useTranslate('recs_temp') }</Text>
       </View>
@@ -80,6 +85,7 @@ export default function OnboardingRecs({ navigation }) {
           as='primary_alt'
           text={ useTranslate('begin') }
           onPress={ () => {
+            getNotifPerms();
             storage.set('onboarded', true);
             navigation.navigate('Home');
           }}

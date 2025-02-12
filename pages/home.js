@@ -194,7 +194,7 @@ export default function HomeScreen({ route, navigation }) {
           <View style={ styles.section }>
             <CardSection onPress={ onCardPress } />
           </View>
-          <Button as='link' text='Clear' onPress={ clearAll } />
+          {/* <Button as='link' text='Clear' onPress={ clearAll } /> */}
           <View style={ styles.subHeadingContainer }>
             <Text style={ styles.subHeading }>{ useTranslate('recipes') }</Text>
             {/* <Button as='link' text={ useTranslate('view_more') } onPress={ () => navigation.navigate('Recipes') } /> */}

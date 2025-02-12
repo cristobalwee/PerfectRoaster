@@ -119,6 +119,25 @@ export default function TimerPage({ route, navigation }) {
       fontFamily: fontFamilies.paragraph,
       fontSize: textSizes.body
     },
+    itemList: {
+      flexDirection: 'column',
+      gap: spacing.lg,
+      marginBottom: spacing.lg,
+      marginTop: spacing.xs
+    },
+    item: {
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      paddingHorizontal: spacing.sm,
+      gap: spacing.lg,
+    },
+    itemText: {
+      fontFamily: fontFamilies.paragraph,
+      fontSize: textSizes.body,
+      flex: 1,
+      flexWrap: 'wrap'
+    },
     doneModalButtonContainer: {
       gap: spacing.sm,
       marginTop: spacing.lg
@@ -196,6 +215,7 @@ export default function TimerPage({ route, navigation }) {
   useEffect(() => {
     if (isFocused && firstLoad && shouldStart) {
       setTime(finalCookTime - trueElapsed / 1000);
+      setDone(false);
       setFirstLoad(false);
     }
 
@@ -213,6 +233,17 @@ export default function TimerPage({ route, navigation }) {
     setShouldStart(true);
     onDisplayNotification(timeToSet, 0, locale);
     setSheet(null);
+  }
+
+  const playTimer = () => {
+    setDone(false);
+    setShouldStart(true);
+
+    if (elapsed === 0) setTime(finalCookTime);
+    
+    setDisplay(finalCookTime);
+    dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: timerType || 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest', multiStepRest: hasNextStep ? rest : 0, activeWeight: (hasNextStep && weight || activeWeight) }));
+    onDisplayNotification(finalCookTime, trueElapsed, locale);
   }
 
   const doneContent = (
@@ -344,6 +375,29 @@ export default function TimerPage({ route, navigation }) {
     </DoneModal>
   );
 
+  const noticeContent = (
+    <>
+      <View style={ styles.itemList }>
+        <View style={ styles.item }>
+          <Image style={{ height: 40, width: 40 }} source={ require('../assets/images/hornilla-gas.png') } />
+          <Text style={ styles.itemText }>{ useTranslate('recs_burner') }</Text>
+        </View>
+        <View style={ styles.item }>
+          <Image style={{ height: 40, width: 40 }} source={ require('../assets/images/ringer.png') } />
+          <Text style={ styles.itemText }>{ useTranslate('recs_ringer') }</Text>
+        </View>
+      </View>
+      <Button
+        as='primary'
+        text={ useTranslate('got_it')}
+        onPress={ () => {
+          playTimer();
+          setSheet(null);
+        }}
+      />
+    </>
+  );
+
   const getSheetContent = () => {
     switch (sheet) {
       case 'cancelar':
@@ -358,6 +412,8 @@ export default function TimerPage({ route, navigation }) {
         return resetContent;
       case 'rest':
         return restContent;
+      case 'sugerencia':
+        return noticeContent;
       default:
         return null;
     };
@@ -423,12 +479,11 @@ export default function TimerPage({ route, navigation }) {
                 dispatch(stopTimer()); 
                 notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
               } else {
-                setDone(false);
-                setShouldStart(true);
-                setTime(finalCookTime);
-                setDisplay(finalCookTime);
-                dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: timerType || 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest', multiStepRest: hasNextStep ? rest : 0, activeWeight: (hasNextStep && weight || activeWeight) }));
-                onDisplayNotification(finalCookTime, trueElapsed, locale);
+                if (trueElapsed > 0) {
+                  playTimer();
+                } else {
+                  setSheet('sugerencia');
+                }
               }
             } }
             icon={ 
