@@ -31,7 +31,7 @@ export async function onDisplayNotification(cookTime, elapsedTime, locale) {
       interruptionLevel: 'timeSensitive',
       critical: true,
       criticalVolume: 1.0,
-      sound: 'alert.wav'
+      sound: 'alert.caf'
     }
   }, trigger);
 };

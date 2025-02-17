@@ -429,7 +429,8 @@ export default function TimerPage({ route, navigation }) {
             <Text style={ styles.subtitle }>{ useTranslate(timeTitle) }</Text>
             <Text allowFontScaling={ false } style={ styles.time }>{ formatTime(time) }</Text>
             { (hasNextStep || (cutHasSteps && timerType === 'cook'))
-              && <View style={ styles.steps }><Text style={ styles.stepsText }>{ useTranslate(stepCounter) }</Text></View> }
+              ? <View style={ styles.steps }><Text style={ styles.stepsText }>{ useTranslate(stepCounter) }</Text></View> 
+              : null }
           </View>
           <Svg width={size} height={size}>
             <Circle 
@@ -495,7 +496,7 @@ export default function TimerPage({ route, navigation }) {
         </View>
         <StatusBar style="auto" />
       </ScrollView>
-      { (rest || hasNextStep) && (
+      { (rest || hasNextStep) ? (
         <FloatingBar 
           content={ nextNotice }
           onPress={ () => {
@@ -504,7 +505,7 @@ export default function TimerPage({ route, navigation }) {
             setSheet('rest');
           } }
         />
-      ) }
+      ) : null }
       <BottomSheet
         backdropOnPress={ onSheetClose }
         isOpen={ sheet }

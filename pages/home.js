@@ -214,7 +214,7 @@ export default function HomeScreen({ route, navigation }) {
       >
         { getSheetContent() }
       </BottomSheet>
-      { isStarted && (
+      { isStarted ? (
         <BottomBar
           offsetBottom={ insets.bottom }
           onLink={ () => navigation.navigate('Timer', { cut: activeCut, cookTime: activeCookTime, shouldStart: true }) }
@@ -229,7 +229,7 @@ export default function HomeScreen({ route, navigation }) {
             });
           }}
         />
-      ) }
+      ) : null }
     </Fragment>
   );
 }
