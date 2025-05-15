@@ -4,7 +4,7 @@ const days = {
 };
 const months = {
   'es_PE': ['ene.', 'feb.', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.'],
-  'en_US': ['Jan.', 'Feb.', 'Mar.', 'April', 'Kay', 'June', 'July', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dic.']
+  'en_US': ['Jan.', 'Feb.', 'Mar.', 'April', 'May', 'June', 'July', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.']
 };
 
 export default function getDay(locale = 'es_PE') {

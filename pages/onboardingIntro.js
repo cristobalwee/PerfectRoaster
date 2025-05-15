@@ -63,6 +63,7 @@ export default function OnboardingIntro({ navigation }) {
         source={ require('../assets/intro_video.mp4') } 
         onError={ () => console.log('error') }
         style={styles.video}
+        resizeMode='cover'
         repeat
       />
       </View>

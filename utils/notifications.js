@@ -1,7 +1,5 @@
-import notifee, { TriggerType } from '@notifee/react-native';
+import notifee, { TriggerType, AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import getTranslation from './getTranslation';
-
-// https://stackoverflow.com/questions/74319959/react-native-navigate-to-particular-screen-when-notification-is-clicked-in-notif
 
 export async function getNotifPerms() {
   await notifee.requestPermission({ criticalAlert: true });
@@ -14,8 +12,11 @@ export async function onDisplayNotification(cookTime, elapsedTime, locale) {
   };
 
   const channelId = await notifee.createChannel({
-    id: 'default',
-    name: 'Default Channel',
+    id: 'default-alert',
+    name: 'High Importance Channel',
+    importance: AndroidImportance.HIGH,
+    sound: 'custom_alert',
+    vibration: true
   });
 
   await notifee.createTriggerNotification({
@@ -23,15 +24,17 @@ export async function onDisplayNotification(cookTime, elapsedTime, locale) {
     body: getTranslation('ready_notif', locale),
     android: {
       channelId,
+      smallIcon: 'ic_perfect_roaster',
+      sound: 'custom_alert',
       pressAction: {
         id: 'default',
+        launchActivity: 'default'
       },
+      visibility: AndroidVisibility.PUBLIC
     },
     ios: {
-      interruptionLevel: 'timeSensitive',
-      critical: true,
-      criticalVolume: 1.0,
-      sound: 'alert.caf'
+      sound: 'custom_alert.caf',
+      interruptionLevel: 'timeSensitive'
     }
   }, trigger);
 };

@@ -1,8 +1,8 @@
-import { Pressable, StyleSheet, Text, View, Image } from 'react-native';
+import { Pressable, Text, Image } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './pages/home';
 import RecipesScreen from './pages/recipes';
-import { fontFamilies, spacing, textSizes } from './constants/styles';
+import { fontFamilies, textSizes } from './constants/styles';
 import RecipeScreen from './pages/recipePage';
 import WeightSelectionPage from './pages/weightSelectionPage';
 import CookSelectionPage from './pages/cookSelectionPage';
@@ -17,6 +17,7 @@ import { setLocale, setTempUnits, setWeightUnits, selectLocale } from './storage
 import { selectActiveCut } from './timerSlice';
 import getTranslation from './utils/getTranslation';
 import MultiStepNoticePage from './pages/multiStepNotice';
+import notifee, { EventType } from '@notifee/react-native';
 
 // https://www.reactnative.university/blog/live-activities-unleashed
 // https://medium.com/@rafiulansari/building-a-react-native-app-part-iv-onboarding-screens-6ef48caefd6c 
@@ -39,6 +40,14 @@ export default function AppContainer({ onboarded, locale, tempUnits, weightUnits
     dispatch(setLocale(locale));
     dispatch(setTempUnits(tempUnits));
     dispatch(setWeightUnits(weightUnits));
+
+    const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        console.log('Notification pressed:', detail.notification);
+      }
+    });
+
+    return () => unsubscribe();
   }, [onboarded, locale, tempUnits, weightUnits]);
 
   if (!fontsLoaded && !fontError) {
