@@ -6,6 +6,7 @@ import AppContainer from './AppContainer';
 import { useEffect, useState } from 'react';
 import { storage } from './utils/storage';
 import './utils/setupDefaultProps';
+import fcmService from './utils/fcmService';
 
 // https://www.reactnative.university/blog/live-activities-unleashed
 // https://medium.com/@rafiulansari/building-a-react-native-app-part-iv-onboarding-screens-6ef48caefd6c 
@@ -25,6 +26,9 @@ export default function App() {
     setLocale(storage.getString('locale'));
     setTemp(storage.getString('tempUnits'));
     setWeight(storage.getString('weightUnits'));
+    
+    // Initialize FCM service
+    fcmService.initialize();
   }, []);
 
   return (

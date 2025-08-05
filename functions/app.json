@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "perfect-roaster-functions",
+    "slug": "perfect-roaster-functions",
+    "version": "1.0.0",
+    "description": "Firebase Functions for Perfect Roaster timer notifications",
+    "sdkVersion": "51.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  }
+}
