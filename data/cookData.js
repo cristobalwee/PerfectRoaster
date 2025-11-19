@@ -258,8 +258,8 @@ export const cookData = {
   'cuy_entero': {
     'sm': {
       weight: 430,
-      cooks: [3180, 3300],
-      rest: 120
+      cooks: [10, 12],
+      rest: 5
     }
   },
   'pato_magret': {

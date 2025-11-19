@@ -26,7 +26,7 @@ import BottomSheet from '../components/bottomSheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getTranslation from '../utils/getTranslation';
 import { selectLocale } from '../storageSlice';
-import { cancelNotif, onDisplayNotification } from '../utils/notifications';
+import { cancelNotif, onDisplayNotification, getActiveTriggerNotifications, cancelAllNotifications } from '../utils/notifications';
 import formatTime from '../utils/formatTime';
 import FloatingBar from '../components/floatingBar';
 import DoneModal from '../components/doneModal';
@@ -226,16 +226,21 @@ export default function TimerPage({ route, navigation }) {
     return unsubscribe;
   });
 
-  const onNextPress = (timeToSet) => {
+  const onNextPress = async (timeToSet) => {
     setDone(false);
     setTime(timeToSet);
     setDisplay(timeToSet);
     setShouldStart(true);
-    onDisplayNotification(timeToSet, 0, locale);
+    try {
+      const notificationId = await onDisplayNotification(timeToSet, 0, locale);
+      console.log('Next step notification scheduled:', notificationId);
+    } catch (error) {
+      console.error('Failed to schedule notification:', error);
+    }
     setSheet(null);
   }
 
-  const playTimer = () => {
+  const playTimer = async () => {
     setDone(false);
     setShouldStart(true);
 
@@ -243,7 +248,13 @@ export default function TimerPage({ route, navigation }) {
     
     setDisplay(finalCookTime);
     dispatch(startTimer({ cut, finalCookTime, nextTimer: hasNextStep ? step2 : rest, type: timerType || 'cook', nextTimerType: hasNextStep ? 'cook' : 'rest', multiStepRest: hasNextStep ? rest : 0, activeWeight: (hasNextStep && weight || activeWeight) }));
-    onDisplayNotification(finalCookTime, trueElapsed, locale);
+    
+    try {
+      const notificationId = await onDisplayNotification(finalCookTime, trueElapsed, locale);
+      console.log('Timer notification scheduled:', notificationId);
+    } catch (error) {
+      console.error('Failed to schedule notification:', error);
+    }
   }
 
   const doneContent = (
@@ -343,7 +354,7 @@ export default function TimerPage({ route, navigation }) {
           dispatch(resetTimer());
           setSheet(null);
           navigation.navigate('Home', { resetState: true });
-          notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
+          cancelAllNotifications();
         }}
       />
       <Button
@@ -361,10 +372,10 @@ export default function TimerPage({ route, navigation }) {
       <Button
         as='primary'
         text={ useTranslate('confirm_cancel')}
-        onPress={ () => {
-          onNextPress(finalCookTime);
+        onPress={ async () => {
+          await onNextPress(finalCookTime);
           dispatch(startTimer({ cut, finalCookTime, nextTimer: rest, type: 'cook', nextTimerType: 'rest' }));
-          notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
+          cancelAllNotifications();
         }}
       />
       <Button
@@ -478,7 +489,7 @@ export default function TimerPage({ route, navigation }) {
               
               if (isStarted) {
                 dispatch(stopTimer()); 
-                notifee.getTriggerNotificationIds().then(ids => ids.forEach(id => cancelNotif(id)));
+                cancelAllNotifications();
               } else {
                 if (trueElapsed > 0) {
                   playTimer();

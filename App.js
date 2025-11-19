@@ -15,6 +15,7 @@ import './utils/setupDefaultProps';
 // https://medium.com/@runawaytrike/font-scaling-in-react-native-apps-8d38a48fdf26
 
 export default function App() {
+
   const [isOnboarded, setOnboarded] = useState(false);
   const [locale, setLocale] = useState('es_PE');
   const [tempUnits, setTemp] = useState('temp_celsius')
@@ -28,9 +29,10 @@ export default function App() {
   }, []);
 
   return (
+    
     <Provider store={ store }>
       <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer>  
           <AppContainer onboarded={ isOnboarded } locale={ locale } tempUnits={ tempUnits } weightUnits={ weightUnits } />
         </NavigationContainer>
       </SafeAreaProvider>

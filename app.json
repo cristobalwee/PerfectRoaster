@@ -44,7 +44,9 @@
         "expo-build-properties",
         {
           "android": {
-            "extraMavenRepos": ["../../node_modules/@notifee/react-native/android/libs"]
+            "extraMavenRepos": [
+              "../../node_modules/@notifee/react-native/android/libs"
+            ]
           }
         }
       ]
@@ -53,6 +55,7 @@
       "eas": {
         "projectId": "ed2d6772-1122-4d92-a90c-a06249a4db0a"
       }
-    }
+    },
+    "owner": "cristo_grana"
   }
 }

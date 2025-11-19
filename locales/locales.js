@@ -170,7 +170,7 @@ export const locales = {
     'start_recipe_info': (time, rest) => `Ready to start a timer for ${time/60}min, followed by ${rest/60}min of rest?`,
     'next_step': (step2) => `Next step: ${step2}min on high heat`,
     'next_step_info': (step2) => `The next step will be to cook the meat for ${step2/60}min on high heat.`,
-    'next_rest': (rest) => `After finishing, rest for ${rest/60}min`,
+    'next_rest': (rest) => `After finishing, rest for ${rest/60} min`,
     'confirm_cancel_current': (time, cut) => `Are you sure? You still have ${time} to finish cooking your ${cut}`,
     'confirm_reset_current': (time, cut) => `Are you sure? Your ${cut} will be ready in ${time}`,
 
